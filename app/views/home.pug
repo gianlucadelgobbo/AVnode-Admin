@@ -1,0 +1,83 @@
+extends layout
+
+block title
+
+
+block content
+  section#home_main_carousel
+    .container
+      .owl-carousel.mono.owl-theme
+        //a(href="/events/live-cinema-festival-2019/")
+          img.img-fluid(src="/images/home/2019/LCF2019-avnode.jpg")
+        //a(href="/events/Festival-Visual-Brasil-2019/")
+          img.img-fluid(src="/images/home/2019/08_vb2019.jpg")
+        //a(href="/events/lunchmeat-festival-2019/")
+          img.img-fluid(src="/images/home/2019/09_lunchmeatfestival2019.jpg")
+        //a(href="/events/signal-2019/")
+          img.img-fluid(src="/images/home/2019/10_signalfestival2019.png")
+        //a(href="/events/patchlab-festival-2020/")
+          img.img-fluid(src="/images/home/2020/02_LCF2020.jpg")
+        //a(href="/events/live-cinema-festival-2020/")
+          img.img-fluid(src="/images/home/2020/03_Patchlab_2020.jpg")
+        a(href="https://vjtelevision.com" target="_blank")
+          img.img-fluid(src="/images/home/2020/01_vjtelevision.jpg")
+
+      
+  section#home_main_title
+    if subtitle
+      .home_main_title_bkg
+        .home_main_title
+          p=subtitle
+
+  section#performances_home.section_home
+    .content_wrapper
+      .container
+        .row
+          .col-lg-12
+            h2.home_title
+              span.title_label!=global.__('Performances overview')
+              a(href="/performances/",  title=global.__('All the performances'))
+                span.button_more_label!=global.__('See all')+"+"                            
+            - var item = data.performances[0]
+                include partials/boxPerformanceHome
+
+  section#home_events_wrapper.section_home
+    .content_wrapper
+      .container
+        .row
+          .col-lg-12
+            h2.home_title
+              span.title_label!=global.__('Next events')
+              a(href="/events/",  title=global.__('All the events'))
+                span.button_more_label!=global.__('See all')+"+"                                                
+        .row
+          .col-sm-6
+            each item, index in data.events
+              if index < 3
+                include partials/boxEventHome
+          .col-sm-6
+            a(href="/events/",  title=global.__('All the events'))
+                div.bkg_seeall
+                    img.img-fluid.arrow_seeall(src="/images/seeall_arrow.svg")
+                    span.seeall_label!=global.__('All the events')            
+
+
+  section#home_news_wrapper.section_home
+    .content_wrapper
+      .container
+        .row
+          .col-lg-12
+            h2.home_title
+              span.title_label!=global.__('News')
+              a(href="/news/",  title=global.__('All the news'))
+                span.button_more_label!=global.__('See all')+"+"                                                
+        .row
+          .col-sm-6
+            a(href="/news/",  title=global.__('All the news'))
+                div.bkg_seeall
+                    img.img-fluid.arrow_seeall(src="/images/seeall_arrow.svg")
+                    span.seeall_label!=global.__('All the news')                                                                           
+          .col-sm-6
+            each item, index in data.news
+              if index < 3
+                include partials/boxNews

@@ -1,0 +1,65 @@
+extends ../layout
+
+block teaser
+  if data.teaserImage
+    .d-flex.justify-content-center.align-items-start
+      img.card-img-top.img-fluid(
+        src=`${data.teaserImageFormats.large}`
+        alt=`${data.name}`
+      )
+
+block title
+  if data.title
+    .container
+      .row.performer_title
+        .col-lg-9
+          h1.main_title=data.title
+            if editable
+              !="  "
+              a.badge.badge-danger(href="/admin/news/"+data._id+"/public")=global.__("EDIT")
+          if data.stats
+            .performance_stat_container
+              .performance_stat_wrapper
+                ul
+                  if data.stats.visits
+                    li=data.stats.visits + ' ' + global.__('Views')
+                  li
+                    span.likes_count=data.stats.likes ? data.stats.likes : 0
+                    !=' ' + global.__('Likes')                      
+        .col-lg-3.share_like_list_column
+          include ../partials/share_like
+
+block content
+  .container
+    .row
+      .col-lg-8
+        p!=data.about
+      .col-lg-4
+        if data.image
+          .mb-3
+            img.card-img-top.img-fluid(
+              src=data.imageFormats.small
+              alt=data.title
+            )
+        if data.web
+          .mb-3
+            each url in data.web
+              a(href=url.url target="_blank")=url.url
+        if data.social
+          .mb-3
+            each url in data.social
+              a(href=url.url target="_blank")=url.url
+                .data_footage_video_wrapper
+        h3=__("Author")
+        each user in data.users
+          .users_video_item_wrapper
+            .media
+              a.mr-3(href="/"+user.slug+"/")
+                img(class=user.imageFormats.small.substring(user.imageFormats.small.lastIndexOf(".")+1), src=user.imageFormats.small, alt=user.stagename)
+              .media-body
+                p.users_performance_item_name
+                  a.mr-3(href="/"+user.slug+"/")=user.stagename
+                if user.addressesFormatted && user.addressesFormatted.length
+                  p.users_performance_item_country!=user.addressesFormatted.join(", ")
+
+

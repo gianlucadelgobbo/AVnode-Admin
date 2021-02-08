@@ -1,0 +1,31 @@
+// Availability
+- var count = 0;
+- var people = [];
+- var subscriptionsIndex = call.subscriptions.map(item => {return item.subscriber_id ? item.subscriber_id._id.toString() : null})
+input(type='hidden', name="program", value=call._id.toString())
+- for (var b=0;b<call.performance.users.length;b++)
+  - if (call.performance.users[b].members && call.performance.users[b].members.length)
+    - for (var c=0;c<call.performance.users[b].members.length;c++)
+      - if (people.indexOf(call.performance.users[b].members[c]._id.toString())==-1)
+        - people.push(call.performance.users[b].members[c]._id.toString())
+        - var index = subscriptionsIndex.indexOf(call.performance.users[b].members[c]._id.toString())
+        - var user = call.performance.users[b].members[c]
+          include acts-edit-sub-row
+          - count++
+  - else
+    - if (people.indexOf(call.performance.users[b]._id.toString())==-1)
+      - people.push(call.performance.users[b]._id.toString())
+      - var index = subscriptionsIndex.indexOf(call.performance.users[b]._id.toString())
+      - var user = call.performance.users[b]
+        include acts-edit-sub-row
+      - count++
+.mb-3
+  b="REFERENCE"
+  select.form-control(name="reference")
+    option="NO REFERENCE"
+    each user in call.performance.users
+      if user.members && user.members.length
+        each member in user.members
+          option(value=member._id, selected=member._id.toString()==call.reference._id.toString() ? "selected" : undefined)=member.stagename
+      else
+        option(value=user._id, selected=call.reference && user._id.toString()==call.reference._id.toString() ? "selected" : undefined)=user.stagename

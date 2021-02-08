@@ -1,0 +1,35 @@
+extends ../../layout_admin
+block topmenu
+  include topmenu
+block content
+  table.table.table-fixed
+    thead
+      tr
+        td.table-firstcolumn-ID="ID"
+        td=global.__("Organization")
+        td=global.__("Members")
+        td=global.__("Web")
+        td=global.__("Socials")
+    tbody
+      if data.length
+        each item, index in data
+          tr
+            td.table-firstcolumn-ID=index+1
+            td
+              h3!=item.stagename
+              if user.is_admin
+                a(href="/admin/crews/"+item._id+"/public", target="_blank")!=global.__("edit")
+                !=" | "
+              a(href="/"+item.slug, target="_blank")!=global.__("view")
+            td
+              each user in item.members
+                .text-nowrap
+                  a(href="/"+user.slug, target="_blank")!=user.stagename
+            td
+              each web in item.web
+                div
+                  a(href=web.url, target="_blank")!=web.url
+            td
+              each social in item.social
+                div
+                  a(href=social.url, target="_blank")!=social.url

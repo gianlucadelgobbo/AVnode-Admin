@@ -1,0 +1,54 @@
+extends ../../../layout_admin
+block content
+  - var mkdir = []
+  - var find = []
+  - var find2 = []
+  if data.length
+    h3="FILES NOT FOUND"
+    ol
+      each item, index in data
+        if !item.exists
+          li!="file: "+global.appRoot+item.file + " "+(item.exists ? '<span class="badge badge-success">OK</span>' : '<span class="badge badge-danger">MISSING</span>' )
+            if item.mkdir
+              - mkdir.push(item.mkdir)
+            if item.find
+              - find.push(item.find)
+              //!=item.find
+              if item.find2
+                - find2.push(item.find2)
+                //!="<br />"
+                //!=item.find2              
+            if item.imageFormats
+              each image, format in item.imageFormats
+                !="<br />"
+                !=format+": "+global.appRoot+image + " "+(item.imageFormatsExists[format] ? '<span class="badge badge-success">OK</span>' : '<span class="badge badge-danger">MISSING</span>' )
+    h3="MISSING FORMATS"
+    ol
+      each item, index in data
+        if item.exists && Object.values(item.imageFormatsExists).indexOf(false)!=-1
+          li
+            !=global.appRoot+item.file + " "+(item.exists ? '<span class="badge badge-success">OK</span>' : '<span class="badge badge-danger">MISSING</span>' )
+            if item.imageFormats
+              each image, format in item.imageFormats
+                !="<br />"
+                !=format+": "+global.appRoot+image + " "+(item.imageFormatsExists[format] ? '<span class="badge badge-success">OK</span>' : '<span class="badge badge-danger">MISSING</span>' )
+    h3="FILES OK"
+    ol
+      each item, index in data
+        if item.exists && Object.values(item.imageFormatsExists).indexOf(false)==-1
+          li
+            !=global.appRoot+item.file + " "+(item.exists ? '<span class="badge badge-success">OK</span>' : '<span class="badge badge-danger">MISSING</span>' )
+            if item.imageFormats
+              each image, format in item.imageFormats
+                !="<br />"
+                !=format+": "+global.appRoot+image + " "+(item.imageFormatsExists[format] ? '<span class="badge badge-success">OK</span>' : '<span class="badge badge-danger">MISSING</span>' )
+    pre
+      !=mkdir.join("\n")
+    pre
+      !=find.join("\n")
+    pre
+      !=find2.join("\n")
+
+    //pre=JSON.stringify(data, null, 2)
+  else
+    h3="EMPTY SET"

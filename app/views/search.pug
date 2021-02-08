@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  .container
+    script.
+      (function() {
+        var cx = '006376263216181099211:nipa3crth2a';
+        var gcse = document.createElement('script');
+        gcse.type = 'text/javascript';
+        gcse.async = true;
+        gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(gcse, s);
+      })();
+    <gcse:searchresults-only></gcse:searchresults-only>

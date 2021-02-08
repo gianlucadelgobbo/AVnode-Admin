@@ -1,0 +1,450 @@
+extends ../../layout_admin
+block topmenu
+  include topmenu
+block content
+  //- var del = []
+    - var emails = []
+    - var emails_noimage = []
+    - var emails_noaddress = []
+    - var emails_notext = []
+    - var emails_noname = []
+  - var counters = {Total:{}, Type: {}, Status:{}, Schedule: {"Scheduled": 0, "Not scheduled": 0}}
+
+  include ./_filters
+
+  - counters.Total.Submissions = data.program.length
+  each item, index in data.program
+    - console.log("perf: "+ item.performance.title)
+    if item.performance.type
+      - if (!counters.Type[item.performance.type.name]) counters.Type[item.performance.type.name] = 0
+      - counters.Type[item.performance.type.name]++
+    else
+      - if (!counters.Type["UNDEFINED"]) counters.Type["UNDEFINED"] = 0
+      - counters.Type["UNDEFINED"]++
+    if item.schedule && item.schedule.length && item.schedule[0].boxDate
+      - counters.Schedule.Scheduled++
+    else
+      - counters.Schedule["Not scheduled"]++
+    each status in data.status
+      - if (item.status._id.toString()==status._id.toString()) {
+        - if(!counters.Status[status.name]) counters.Status[status.name] = 0
+        - counters.Status[status.name]++
+      - }
+
+  .row
+    each counter, countername in counters
+      .col
+        b=countername
+        ul
+          each item, index in counter
+            li!=index+": <b>"+item+"</b>"
+
+  if data.performnce_missing
+    pre=data.performnce_missing
+  - var people = []
+  table.table.table-fixed#table-acts(data-toggle="table", data-classes=" ", data-show-columns="true", data-search="true")
+    thead
+      tr
+        th.table-firstcolumn-ID="ID"
+        th="STATUS"
+        th="ACT"
+        th="AUTHORS"
+        th="SUBSCRIPTION"
+    tbody
+      each item, index in data.program
+        tr(id='sub'+item._id) 
+          td.table-firstcolumn-ID!=(index+1)
+          td
+            form(action="")
+              .border-bottom.pb-1.mb-1
+                h4=global.__('STATUS')
+                each status in data.status
+                  .form-check.text-nowrap
+                    input.form-check-input.change-status(id='status'+status._id+item._id, data-id=item._id, data-status=status._id, name='status'+item._id, type='radio', value=status._id, checked=item.status._id.toString()==status._id.toString() ? "checked" : undefined)
+                    label.form-check-label(for='status'+status._id+item._id)=status.name
+              .border-bottom.pb-1.mb-1
+                h4=global.__('SCHEDULE')
+                if item.schedule && item.schedule.length && item.schedule[0].boxDate
+                  each schedule, index in item.schedule
+                    if schedule.boxDate
+                      div=schedule.venue.room
+                      div=schedule.boxDate
+                      if schedule.price && !item.schedule[0].alleventschedulewithoneprice
+                        p.price
+                          !="Price: <b>"+schedule.price+",00 €</b>"
+                          !=" | "
+                          b
+                            a.edit-price(data-program=item._id, href="#")
+                              span(data-toggle="tooltip", data-placement="top", title=global.__("edit"))
+                                i.fas.fa-edit
+
+                  if item.schedule[0].price && item.schedule[0].alleventschedulewithoneprice
+                    p.price
+                      !="Price: <b>"+item.schedule[0].price+",00 €</b>"
+                      !=" | "
+                      b
+                        a.edit-price(data-program=item._id, href="#")
+                          span(data-toggle="tooltip", data-placement="top", title=global.__("edit"))
+                            i.fas.fa-edit
+                  else if !item.schedule[0].price
+                    p.price
+                      !="Price: "
+                      span.badge.badge-info=global.__('FREE ENTRY')
+                      !=" | "
+                      b
+                        a.edit-price(data-program=item._id, href="#")
+                          span(data-toggle="tooltip", data-placement="top", title=global.__("edit"))
+                            i.fas.fa-edit
+                else
+                  .badge.badge-danger=global.__('TO BE SCHEDULED')
+                div
+                  b="Costs"
+                  !=" | "
+                  b
+                    a.edit-cost(data-program=item._id, href="#")
+                      span(data-toggle="tooltip", data-placement="top", title=global.__("edit"))
+                        i.fas.fa-edit
+                  br
+                  if item.fee || item.accommodation_cost || item.transfer_cost
+                    !="Fee: <b>"+(item.fee ? item.fee : "0")+" €</b>"
+                    br
+                    !="Technical cost: <b>"+(item.technical_cost ? item.technical_cost : "0")+" €</b>"
+                    br
+                    !="Accommodation cost: <b>"+(item.accommodation_cost ? item.accommodation_cost : "0")+" €</b>"
+                    br
+                    !="Transfer cost: <b>"+(item.transfer_cost ? item.transfer_cost : "0")+" €</b>"
+                    br
+                    !="Total: <b>"+((item.accommodation_cost ? item.accommodation_cost : 0)+(item.technical_cost ? item.technical_cost : 0)+(item.transfer_cost ? item.transfer_cost : 0)+(item.transfer_cost ? item.transfer_cost : 0))+" €</b>"
+                  else 
+                    .badge.badge-info=global.__('NO COSTS')
+              .text-right.pb-1.mb-1
+                button.mr-2.btn.btn-danger.btn-sm.btn-inline.cancel-sub(type='button', data-id=item._id)=global.__('Delete')
+          td(style="max-width:35vw;overflow: hidden;")
+            if index>0 && get.sortby=="sortby_perf_name" && item.performance._id == data.program[index-1].performance._id && item.call == data.program[index-1].call
+              span.badge.badge-danger="DUPLICATE"+item.call+" "+data.program[index-1].call
+            h2.mb-0(style="overflow:hidden;max-width: 500px;")!=item.performance.title
+            .mb-2
+              !=" "
+              if user.is_admin
+                a(href="/admin/performances/"+item.performance._id+"/public", target="_blank")
+                  span(data-toggle="tooltip", data-placement="top", title=global.__("edit"))
+                    i.fas.fa-edit
+                !=" | "
+              a(href="/performances/"+item.performance.slug, target="_blank")
+                span(data-toggle="tooltip", data-placement="top", title=global.__("View"))
+                  i.fa.fa-eye
+              !=" | TYPE: "
+              if item.performance.type
+                b=item.performance.type.name
+              else 
+                span.badge.badge-danger="UNDEFINED"
+            .row
+              if get.fullinfo
+                .col-md-6
+                  img.img-fluid(src=item.performance.imageFormats.small)
+              div(class=get.fullinfo ? "col-md-6" : "col-md-12")
+                p
+                  !="PUBLIC: "
+                  if item.performance.is_public
+                    span.badge.badge-success="OK"
+                  else
+                    span.badge.badge-danger="MISSING PUBLIC"
+                  br
+                  !="DURATION: "
+                  b=item.performance.duration
+                    if item.performance.duration != parseFloat(item.performance.duration)
+                      !=" "
+                      span.badge.badge-danger="WRONG DURATION"
+                  br
+                  if item.performance.tecnique
+                    !="STYLE: "
+                    b=item.performance.tecnique.name
+                    br
+                  if item.performance.genre
+                    !="GENRE: "
+                    b=item.performance.genre.name
+                    br
+                  !="CALL: "
+                  if (item.call>=0 && data.event.organizationsettings.call && data.event.organizationsettings.call.calls && data.event.organizationsettings.call.calls[item.call] && data.event.organizationsettings.call.calls[item.call].title)
+                    b!=data.event.organizationsettings.call.calls[item.call].title
+                  else 
+                    .badge.badge-danger MISSING CALL
+                  br
+                  !="TOPICS: "
+                  if item.topics
+                    b!=item.topics.join(", ")
+                  else
+                    .badge.badge-danger MISSING
+                  br
+            if get.fullinfo
+              .mt-2
+                if item.performance.about
+                  !=item.performance.about
+                else
+                  .badge.badge-danger MISSING
+              .mt-2
+                b TECHNOLOGIES WITH THE ARTISTS
+                br
+                !=item.performance.tech_art
+              .mt-2
+                b TECHNICAL REQUIREMENTS
+                br
+                !=item.performance.tech_req
+              if item.performance.videos && item.performance.videos.length
+                .mt-2
+                  b VIDEOS
+                  ul.lightvideos
+                    each video in item.performance.videos
+                      if video.media && video.media.file
+                        li(data-html="#"+video._id, data-poster=video.imageFormats.large, data-sub-html=video.title )
+                          //!=video.title
+                          img(src=video.imageFormats.small)
+                      else
+                        !=" "
+                        .badge.badge-danger MISSING MEDIAS
+                        //- del.push("db.videos.remove(_id:ObjectId('"+video._id+"')\n")
+                  each video in item.performance.videos
+                    if video.media && video.media.file
+                      div(style='display:none;', id=video._id)
+                        video.lg-video-object.lg-html5.video-js.vjs-big-play-centered.vjs-default-skin(controls='', preload='none')
+                          source(src="https://avnode.net"+video.media.file, type='video/mp4')
+                          !="Your browser does not support HTML5 video."
+    
+              if item.performance.galleries && item.performance.galleries.length
+                .mt-2
+                  b GALLERIES
+                  ul
+                    each gallery in item.performance.galleries
+                      li
+                        !=gallery.title
+                        if gallery.medias.length
+                          .lightgallery
+                            each media in gallery.medias
+                              a.media(href=media.imageFormats.large)
+                        else
+                          !=" "
+                          .badge.badge-danger MISSING MEDIAS
+                          //- del.push("db.galleries.remove(_id:ObjectId('"+gallery._id+"')\n")
+          td(style="max-width: 23vw;overflow: hidden;")
+            each useruser in item.performance.users
+              //
+                if useruser.imageFormats.small=="https://avnode.net/images/default-user.svg" || item.performance.imageFormats.small=="https://avnode.net/images/default-item.svg"
+                  - var str = '["'+(item.reference.lang=="it" ? "it" : "en")+'","'+item.performance.title.replace(/"/g,"''")+'","'+item.reference.name.replace(/"/g,"''")+'","'+item.reference.surname.replace(/"/g,"''")+'","'+item.reference.email+'"]'
+                  - if (emails_noimage.indexOf(str)==-1) emails_noimage.push(str)
+                if !useruser.about || !item.performance.about
+                  - var str = '["'+(item.reference.lang=="it" ? "it" : "en")+'","'+item.performance.title.replace(/"/g,"''")+'","'+item.reference.name.replace(/"/g,"''")+'","'+item.reference.surname.replace(/"/g,"''")+'","'+item.reference.email+'"]'
+                  - if (emails_notext.indexOf(str)==-1) emails_notext.push(str)
+              .row
+                if get.fullinfo
+                  .col-md-6
+                    img.img-fluid(class=useruser.imageFormats.small.substring(useruser.imageFormats.small.lastIndexOf(".")+1), src=useruser.imageFormats.small, alt=useruser.stagename)
+                div(class=get.fullinfo ? "col-md-6" : "col-md-12")
+                  h3.mb-0
+                    !=useruser.stagename
+                    if useruser.is_crew
+                      !=" "
+                      .badge.badge-info CREW
+                  .mb-2
+                    !=" "
+                    if user.is_admin
+                      a(href="/admin/"+(useruser.is_crew ? "crews" : "profile")+"/"+useruser._id+"/public", target="_blank")
+                        span(data-toggle="tooltip", data-placement="top", title=global.__("edit"))
+                          i.fas.fa-edit
+                      !=" | "
+                    a(href="/"+useruser.slug, target="_blank")
+                      span(data-toggle="tooltip", data-placement="top", title=global.__("View"))
+                        i.fa.fa-eye
+                    !=" | "
+
+                    if useruser.addressesFormatted && useruser.addressesFormatted.length
+                      !=useruser.addressesFormatted.join(", ")
+                    else
+                      .badge.badge-danger MISSING ADDRESS
+              if get.fullinfo
+                .mt-2!=useruser.aboutFull ? useruser.aboutFull : useruser.about
+                if useruser.web
+                  .mt-3
+                    b!="WEB"
+                  ul
+                    each web in useruser.web.map((item) => {return '<a href="'+item.url+'">'+item.url+'</a><br />'})
+                      li!=web
+                if useruser.social
+                  .mt-3
+                    b!="SOCIAL"
+                  ul
+                    each social in useruser.social.map((item) => {return '<a href="'+item.url+'">'+item.url+'</a><br />'})
+                      li!=social
+              
+              //td!=item.performance.users.map((item) => {return item.addressesFormatted}).join("<br />")
+                - var addresses = item.performance.users.map((item) => {return item.addresses.map((item) => {return item.country})})
+                - var addressesaddresses = Array.from(new Set([].concat.apply([], addresses)))
+                p!=addressesaddresses.sort().join(", ")
+
+          td
+            p
+              b!="AVAILABILITY"
+              !=" | "
+              b
+                a.edit-availability(data-program=item._id, href="#")
+                  span(data-toggle="tooltip", data-placement="top", title=global.__("edit"))
+                    i.fas.fa-edit
+            if !item.subscriptions || !item.subscriptions.length
+              .badge.badge-danger MISSING
+            else
+              ol
+                each subscription in item.subscriptions
+                  li
+                    if subscription.subscriber_id                    
+                      b!=subscription.subscriber_id.stagename
+                      !=" "+subscription.subscriber_id.name+" "+subscription.subscriber_id.surname
+                      //if !subscription.subscriber_id.name || !subscription.subscriber_id.surname
+                        - var str = '["'+(item.reference.lang=="it" ? "it" : "en")+'","'+item.performance.title.replace(/"/g,"''")+'","'+item.reference.name.replace(/"/g,"''")+'","'+item.reference.surname.replace(/"/g,"''")+'","'+item.reference.email+'"]'
+                        - if (emails_noname.indexOf(str)==-1) emails_noname.push(str)
+                      br
+                      if subscription.subscriber_id.addressesFormatted && subscription.subscriber_id.addressesFormatted.length
+                        !=subscription.subscriber_id.addressesFormatted.join(", ")
+                      else
+                        .badge.badge-danger MISSING ADDRESS
+                        //- var str = '["'+(item.reference.lang=="it" ? "it" : "en")+'","'+item.performance.title.replace(/"/g,"''")+'","'+item.reference.name.replace(/"/g,"''")+'","'+item.reference.surname.replace(/"/g,"''")+'","'+item.reference.email+'"]'
+                          - if (emails_noaddress.indexOf(str)==-1) emails_noaddress.push(str)
+                      if subscription.freezed
+                        !=" "
+                        .badge.badge-info freezed
+                      if people.indexOf(subscription.subscriber_id._id.toString())==-1
+                        //- people.push(subscription.subscriber_id._id.toString())
+                        if subscription.freezed && (!get.sortby || get.sortby=="0") && (!get.status || get.status=="0") && (!get.performance_category || get.performance_category=="0") && (!get["subscriptions.packages.name"] || get["subscriptions.packages.name"]=="0") && (!get["bookings.schedule.venue.room"] || get["bookings.schedule.venue.room"]=="0")
+                          !=" "
+                          .badge.badge-danger WRONG FREEZED?
+                      else if !subscription.freezed && (!get.sortby || get.sortby=="0") && (!get.status || get.status=="0") && (!get.performance_category || get.performance_category=="0") && (!get["subscriptions.packages.name"] || get["subscriptions.packages.name"]=="0") && (!get["bookings.schedule.venue.room"] || get["bookings.schedule.venue.room"]=="0")
+                        !=" "
+                        .badge.badge-danger MISSING FREEZED?
+                      br
+                      if subscription.daysFormatted
+                        u="Availability"
+                        !=": "
+                        !=subscription.daysFormatted.join(" | ")
+                      br
+                      u!="PACKAGES"
+                      ul
+                        each pack in subscription.packages
+                          li
+                            !=pack.name
+                            if pack.options_name
+                              br
+                              !=pack.options_name
+                              !=": "
+                              if pack.option
+                                !=pack.option
+                                if pack.option_value
+                                  !=" | "+pack.option_value
+                              else 
+                                .badge.badge-danger!="MISSING"+" "+pack.options_name
+                    else 
+                      .badge.badge-danger!="MISSING SUBSCRIBER ID"
+                        
+            p
+              if item.reference
+                //- var str = '["'+(item.reference.lang=="it" ? "it" : "en")+'","'+item.performance.title.replace(/"/g,"''")+'","'+item.reference.name.replace(/"/g,"''")+'","'+item.reference.surname.replace(/"/g,"''")+'","'+item.reference.email+'"]'
+                  - if (emails.indexOf(str)==-1) emails.push(str)
+                b!="REFERENCE"
+                br
+                !=item.reference.name+" "+item.reference.surname
+                br
+                if item.reference.email
+                  !='<a href="mailto:'+item.reference.email+'" target="_blank">'+item.reference.email+'</a> <a href="https://mail.google.com/mail/u/0/#search/'+item.reference.email+'" target="_blank">SEARCH MESSAGES</a>'
+                else
+                  !=" "
+                  .badge.badge-danger MISSING EMAIL
+                br
+                if item.reference.mobile && item.reference.mobile.length
+                  !=mobile=item.reference.mobile.map(item => {if (item.url) return item.url+' '+'<a href="https://web.whatsapp.com/send?phone='+item.url.replace("+","").replace(/ /g,"")+'" target="_blank">Whatsapp</a>';})
+                else
+                  !=" "
+                  .badge.badge-danger MISSING MOBILE
+              else 
+                .badge.badge-danger!="MISSING REFERENCE"
+
+        //if get.fullinfo
+          tr
+            td!=(index+1)
+            td
+              img.img-fluid(src=item.performance.imageFormats.small)
+              !=item.performance.about
+            td(colspan="3")
+              each user, i in item.performance.users
+            - var addresses = item.performance.users.map((item) => {return item.addresses.map((item) => {return item.country})})
+            - var addressesaddresses = Array.from(new Set([].concat.apply([], addresses)))
+            td
+              if subscription_id
+                !=item.subscription_id.reference.name+" "+item.subscription_id.reference.surname
+                br
+                !='<a href="mailto:'+item.subscription_id.reference.email+'">'+item.subscription_id.reference.email+'</a> <a href="https://mail.google.com/mail/u/0/#search/'+item.subscription_id.reference.email+'">SEARCH MESSAGES</a>'
+                br
+                !=item.subscription_id.reference.mobile.map((item) => {return item.url+' '+'<a href="https://web.whatsapp.com/send?phone='+item.url.replace("+","").replace(/ /g,"")+'">WP</a>'})
+              if item.schedule && item.schedule.date
+                pre=item.schedule.boxDate
+                p=item.schedule.venue.room
+                if item.status
+                  each cat in item.status
+                    if cat.ancestor.slug == "status"
+                      p=cat.name
+                //pre=item.schedule
+
+
+  // Modal Add Partner
+  #modalEdit.modal.admindevmodal.fade(tabindex='-1', role='dialog', aria-labelledby='modalAddPartnerLabel', aria-hidden='true')
+    .modal-dialog.modal-lg(role='document')
+      .modal-content
+        form#editSubscription
+          .modal-header
+            h5#modalAddPartnerLabel.modal-title=global.__("Edit subscription")
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            .alert.alert-danger bella
+            .alert.alert-success bella
+            .content
+
+          .modal-footer
+            button.btn.btn-secondary(type='button', data-dismiss='modal')=global.__("Close")
+            button.btn.btn-primary(type='submit')=global.__("Save")
+  
+  //
+    textarea.form-control(name='to')=del.join("\n")
+    br
+    form(method='post', action='http://localhost:8004/composer')
+      textarea.form-control(name='to')="["+emails.join(",")+"]"
+      .text-center
+        br
+        button.btn.btn-success(type='submit') Compose email
+    if emails_noimage.length
+      h3="emails_noimage"
+      form(method='post', action='http://localhost:8004/composer')
+        textarea.form-control(name='to')="["+emails_noimage.join(",")+"]"
+        .text-center
+          br
+          button.btn.btn-success(type='submit') Compose email
+    if emails_noaddress.length
+      h3="emails_noaddress"
+      form(method='post', action='http://localhost:8004/composer')
+        textarea.form-control(name='to')="["+emails_noaddress.join(",")+"]"
+        .text-center
+          br
+          button.btn.btn-success(type='submit') Compose email
+    if emails_notext.length
+      h3="emails_notext"
+      form(method='post', action='http://localhost:8004/composer')
+        textarea.form-control(name='to')="["+emails_notext.join(",")+"]"
+        .text-center
+          br
+          button.btn.btn-success(type='submit') Compose email
+    if emails_noname.length
+      h3="emails_noname"
+      form(method='post', action='http://localhost:8004/composer')
+        textarea.form-control(name='to')="["+emails_noname.join(",")+"]"
+        .text-center
+          br
+          button.btn.btn-success(type='submit') Compose email
+  
+
+  //pre=JSON.stringify(data, null, 2)

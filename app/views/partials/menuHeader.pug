@@ -1,0 +1,118 @@
+nav.navbar.navbar_extended_template.navbar-toggleable-md.navbar-fixed-top.navbar-inverse.bg-inverse.navbar-expand-lg 
+  .container
+    button.navbar-toggler.navbar-toggler-right(type="button", data-toggle="collapse", data-target="#navbar-collapse_performer_template")
+      span.lnr.lnr-menu.toggle_icon
+    a.navbar-brand(href='/', title="AVnode.net")
+      img(src='/images/logo_avnode_bar.svg', height='30', class='main_logo' alt='AVnode.net')
+
+    .collapse.navbar-collapse#navbar-collapse_performer_template
+      include menuSections
+      ul.user_navbar.navbar-nav
+        li.dropdown.mt-1.mr-2#dropdownContents
+          button#dropdownMenuContents.btn.btn-primary.btn-sm.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')=global.__('New content')+" "
+          .dropdown-menu(aria-labelledby='dropdownMenuContents')
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("Performance Name")
+              data-title=global.__("Add Performance")
+              data-user=user && user._id ? user._id : undefined
+              data-param="title"
+              data-sez="performances")=global.__('New Performance')
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("Video Title")
+              data-title=global.__("Add VJ Television Video")
+              data-param="title"
+              data-user=user && user._id ? user._id : undefined
+              data-sez="videos")=global.__('New VJ Television Video')
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("Learning Title")
+              data-title=global.__("Add Learning")
+              data-param="title"
+              data-user=user && user._id ? user._id : undefined
+              data-sez="performances")=global.__('New Learning')
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("Event Name")
+              data-title=global.__("Add Event")
+              data-param="title"
+              data-user=user && user._id ? user._id : undefined
+              data-sez="events")=global.__('New Event')
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("News Title")
+              data-title=global.__("Add News")
+              data-param="title"
+              data-user=user && user._id ? user._id : undefined
+              data-sez="news")=global.__('New News')
+            .dropdown-divider
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("Video Title")
+              data-title=global.__("Add Video")
+              data-param="title"
+              data-user=user && user._id ? user._id : undefined
+              data-sez="videos")=global.__('New Video')
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("Gallery Name")
+              data-title=global.__("Add Gallery")
+              data-param="title"
+              data-user=user && user._id ? user._id : undefined
+              data-sez="galleries")=global.__('New Gallery')
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("Crew Name")
+              data-title=global.__("Add Crew")
+              data-param="stagename"
+              data-user=user && user._id ? user._id : undefined
+              data-sez="users")=global.__('New Crew')
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("Organization Name")
+              data-title=global.__("Add Organization")
+              data-param="stagename"
+              data-user=user && user._id ? user._id : undefined
+              data-sez="users")=global.__('New Organization')
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("Footage Title")
+              data-title=global.__("Add Footage")
+              data-param="title"
+              data-user=user && user._id ? user._id : undefined
+              data-sez="footage")=global.__('New Footage')
+            a.dropdown-item(href='#'
+              data-labelfield=global.__("Playlist Name")
+              data-title=global.__("Add Playlist")
+              data-param="title"
+              data-user=user && user._id ? user._id : undefined
+              data-sez="playlist")=global.__('New Playlist')
+
+        if user
+          //li.nav-item.dropdown.user_menu.user_menu_logged                  
+          li.nav-item.dropdown.user_menu.user_menu_logged
+            a#userDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+              span.lnr.lnr-user
+            .dropdown-menu.dropdown-menu-right(aria-labelledby='userDropdown')
+              a.dropdown-item(href='/'+user.slug)                    
+                span.pr-2.lnr.lnr-eye
+                !=" "+global.__('Profile')
+              a.dropdown-item(href='/admin/profile/'+user._id+'/public')                    
+                span.pr-2.lnr.lnr-cog
+                !=" "+global.__('Control Panel')
+              a.dropdown-item(href='/logout')                    
+                span.pr-2.lnr.lnr-exit
+                !=" "+global.__('Log out')
+        else
+          li.nav-item.signup_ico
+            a.nav-link.disabled(href='#')
+              span.pr-2.lnr.lnr-user
+          li.nav-item.login
+            a.nav-link(href="/login?returnTo="+canonical, title=global.__('Login'))
+              !=global.__('Login')
+          li.nav-item.signup
+            a.nav-link(href='/signup', title=global.__('Sign up'))=global.__('Sign up')
+        li.nav-item.search
+          if url && url.indexOf("/search")===0
+            a.nav-link(href='#')
+              i.fa.fa-search.fa-lg.fa-fw
+          else
+            a.nav-link(href='#searchbar', title=__('Search'), data-toggle="collapse", role="button", aria-expanded="false", aria-controls="searchbar")
+              i.fa.fa-search.fa-lg.fa-fw
+        li.nav-item.dropdown.lang
+          a#langDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+            b=session.current_lang.toUpperCase()
+          .dropdown-menu.dropdown-menu-right(aria-labelledby='langDropdown')
+            each lang,slug in config.locales_labels
+              a.dropdown-item(href='//'+(slug!='en' ? config.lang_to_domain[slug]+'.' : '')+basehost+current_url class=slug==session.current_lang ? 'disabled' : '')=lang

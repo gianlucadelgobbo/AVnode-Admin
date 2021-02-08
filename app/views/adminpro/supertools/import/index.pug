@@ -1,0 +1,12 @@
+extends ../../../layout_admin
+block content
+  .container.mb-2
+    form(action=formUrl.split("?")[0], method="post")
+      textarea(name="q").form-control.mb-2
+        if body
+          !=body
+        else 
+          !='["3dmotion","4youreye"]'
+      .text-right
+        button.btn.btn-primary(type="submit")="SUBMIT"
+  pre=JSON.stringify(data, null, 2)

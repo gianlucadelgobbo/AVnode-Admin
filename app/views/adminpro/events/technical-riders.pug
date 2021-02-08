@@ -1,0 +1,86 @@
+extends ../../layout_admin
+block topmenu
+  include topmenu
+block content
+  include ./_filters
+  .white-content
+    if get.techonly=="1"
+      table.table.table-fixed
+        thead
+          tr
+            th.table-firstcolumn-ID="ID"
+            th="Item"
+            th="Day"
+            th="Room"
+            th="Performance"
+            th="EDIT"
+        - var conta = 1
+        tbody
+          each day in data.programmebydayvenue
+            each room,i in day.rooms
+              if (get['bookings.schedule.venue.room'] && get['bookings.schedule.venue.room'].indexOf(room.schedule.venue.room)>-1)
+                if room.program
+                  each program,ii in room.program
+                    - var tech_reqs = program.performance.tech_req.split("- ")
+                    each tech_req,iii in tech_reqs
+                      tr
+                        td.table-firstcolumn-ID!=conta
+                        td!=tech_req
+                        td!=day.date
+                        td!=room.schedule.venue.room
+                        td!=program.performance.title
+                        td
+                          if user.is_admin
+                            a(href="/admin/performances/"+program.performance._id+"/public", target="_blank")!="EDIT"
+                        - conta++
+    else
+
+      each day in data.programmebydayvenue
+        each room,i in day.rooms
+          if (get['bookings.schedule.venue.room'] && get['bookings.schedule.venue.room'].indexOf(room.schedule.venue.room)>-1)
+            if room.program
+              h2=day.date+" | "+room.schedule.venue.room
+              - conta++
+              each program,ii in room.program
+                .position-relative.mt-5
+                  .index.badge.disabled=(ii+1)
+                  .title
+                    h3!=program.schedule.starttimeTime+" - "+program.schedule.endtimeTime+" | "+program.performance.duration+" min. | "+program.performance.title
+                  .type.small=program.performance.type.name
+                  - var availables = program.subscriptions.map(subscription => {return subscription.subscriber_id._id.toString()})
+                  each user in program.performance.users
+                    if user.is_crew 
+                      each member in user.members
+                        if availables.indexOf(member.toString())!=-1
+                          - var uu = program.subscriptions[availables.indexOf(member.toString())].subscriber_id
+                          p
+                            b!=user.stagename
+                            !=" | "+uu.name+" "+uu.surname+" AKA "+uu.stagename
+                            - var daydayA = []
+                            each day, i in data.days
+                              - if (daydayA[i]!=-1) daydayA[i] = program.subscriptions[availables.indexOf(member.toString())].days.map(item => {return new Date(item).getTime()}).indexOf(day)
+                            each day, i in daydayA
+                              span.ml-1.badge.badge-pill(class=day==-1 ? "badge-danger" : "badge-success")
+                                !=new Date(data.days[i]).getDate()
+                            !=uu.addressesFormatted
+
+                    else
+                      if availables.indexOf(user._id.toString())!=-1
+                        - var uu = program.subscriptions[availables.indexOf(user._id.toString())].subscriber_id
+                        p!=uu.name+" "+uu.surname+" AKA "+uu.stagename
+                          - var daydayA = []
+                          each day, i in data.days
+                            - if (daydayA[i]!=-1) daydayA[i] = program.subscriptions[availables.indexOf(user._id.toString())].days.map(item => {return new Date(item).getTime()}).indexOf(day)
+                          each day, i in daydayA
+                            span.ml-1.badge.badge-pill(class=day==-1 ? "badge-danger" : "badge-success")
+                              !=new Date(data.days[i]).getDate()
+                          !=uu.addressesFormatted
+                  .mt-2
+                    b TECHNOLOGIES WITH THE ARTISTS
+                    br
+                    !=program.performance.tech_art
+                  .mt-2
+                    b TECHNICAL REQUIREMENTS
+                    br
+                    !=program.performance.tech_req
+              .page-break

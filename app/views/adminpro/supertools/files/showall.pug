@@ -1,0 +1,30 @@
+extends ../../../layout_admin
+block content
+  ol
+    each item, index in data
+      if item.exists
+        li
+          !=global.appRoot+item.file + " "+(item.exists ? '<span class="badge badge-success">OK</span>' : '<span class="badge badge-danger">MISSING</span>' )
+          if item.imageFormats
+            each image, format in item.imageFormats
+              !="<br />"
+              !=format+": "+global.appRoot+image + " "+(item.imageFormatsExists[format] ? '<span class="badge badge-success">OK</span>' : '<span class="badge badge-danger">MISSING</span>' )
+  - var mkdir = []
+  if data.length
+    each item, index in data
+      if !item.exists && item.mkdir && mkdir.indexOf(item.mkdir)===-1
+        - mkdir.push(item.mkdir)
+    - mkdir.sort()
+    b="MK Dir"
+    ol
+      if mkdir.length
+        each item in mkdir
+          li=item
+    b="Find file"
+    ol
+      each item, index in data
+        if item.find
+          li!=item.find
+            if item.find2
+              !="<br />"
+              !=item.find2

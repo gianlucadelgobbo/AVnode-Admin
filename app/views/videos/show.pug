@@ -1,0 +1,168 @@
+extends ../layout
+
+block teaser
+
+block title
+  if data.title
+    .container
+      .row.performer_title
+        .col-lg-9
+          h1.main_title=data.title
+            if editable
+              !="  "
+              a.badge.badge-danger(href="/admin/videos/"+data._id+"/public")=global.__("EDIT")
+          if data.stats
+            .performance_stat_container
+              .performance_stat_wrapper
+                ul
+                  if data.stats.visits
+                    li=data.stats.visits + ' ' + global.__('Views')
+                  li
+                    span.likes_count=data.stats.likes ? data.stats.likes : 0
+                    !=' ' + global.__('Likes')
+                  if data.stats.downloads
+                    li=data.stats.downloads + ' ' + global.__('Downloads')
+        .col-lg-3.share_like_list_column
+          include ../partials/share_like
+
+block content
+  .container
+    .row
+      .col-md-8
+        .embed-responsive(class=(data.media.width/data.media.height<1.4 ? "embed-responsive-4by3" : "embed-responsive-16by9"))
+          //.embed-responsive
+          if data.media && data.media.file
+            .toclone
+              table
+                tr
+                  td(style="width:100%")
+                    //.users_video_item_wrapper
+                      .flex
+                          img(class=data.users[0].imageFormats.small.substring(data.users[0].imageFormats.small.lastIndexOf(".")+1), src=data.users[0].imageFormats.small, alt=data.users[0].stagename)
+                      .flex
+                        h1
+                          a(href="https://avnode.net/videos/"+data.slug+"/")=data.title
+                        .users_performance_item_name
+                          !=__("Author")+": "
+                          a.mr-3(href="/"+data.users[0].slug+"/")=data.users[0].stagename
+                          if data.users[0].addressesFormatted && data.users[0].addressesFormatted.length
+                            !=" | "
+                            span.users_performance_item_country!=data.users[0].addressesFormatted.join(", ")
+                  td(style="width:50px")
+                    ul.share_like_list.list-unstyled
+                      li
+                        a(href="javascript:myModal.open();")
+                          .share_button
+                              img(src="/images/icon_embed.svg")        
+                          .label_like_button_wrapper
+                              span.label_like_button="embed"
+                      //li
+                        a(href="javascript:window.open('https://www.addtoany.com/share_save?linkurl='+encodeURIComponent(document.URL), 'Share Dialog', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,width=650,height=450,top='+(screen.height/2-450/2)+',left='+(screen.width/2-650/2));")
+                          .share_button
+                              img(src="/images/icon_share.svg")        
+                          .label_like_button_wrapper
+                              span.label_like_button="share"
+                      - var payload = data.img ? "{\"section\":\""+section+"\",\"id\":\""+data._id+"\",\"img_index\":\""+data.img.index+"\",\"img_slug\":\""+data.img.slug+"\"}" : "{\"section\":\""+section+"\",\"id\":\""+data._id+"\"}" 
+                      //li
+                        button#liker.button_share_like(type="button" data-endpoint="/likes/" data-method="GET" data-payload=payload style=data.liked ? "opacity: .65;" : undefined)
+                          .share_button
+                              img(src=data.liked ? "/images/like_full_icon.svg" : "/images/icon_like.svg")
+                          .label_like_button_wrapper
+                              span.label_like_button=data.liked ? "Unlike" : "Like"        
+            video.embed-responsive-item#my-video.video-js.vjs-big-play-centered(disablePictureInPicture width='100%', height='100%', poster=data.imageFormats.large)
+              source(src=process.env.WAREHOUSE+data.media.file, type='video/mp4')
+              //source(src='MY_VIDEO.webm', type='video/webm')
+              p.vjs-no-js
+                !=global.__("To view this video please enable JavaScript, and consider upgrading to a web browser that supports")
+                a(href='http://videojs.com/html5-video-support/', target='_blank')=!"HTML5 video"
+          if data.media && data.media.iframe
+            !=data.media.iframe
+
+      .col-md-4.data_footage_video
+        .data_footage_video_wrapper
+          h3=__("Data")
+          if data.media
+            ul
+              if data.media.originalname || data.media.file
+                li=global.__('File name')+": "
+                  b=data.media.originalname ? data.media.originalname : data.media.file.substring(data.media.file.lastIndexOf("/")+1)
+              if data.media.filesizeHR
+                li=global.__('File size')+": "
+                  b=data.media.filesizeHR
+              if data.media.duration
+                li=global.__('File duration')+": "
+                  b=data.media.durationHR
+              if data.media.mimetype
+                li=global.__('File type')+": "
+                  b=data.media.mimetype
+              if data.media.width && data.media.height
+                li=global.__('Video dimensions')+": "
+                  b=data.media.width+"x"+data.media.height
+        if (data.categories && data.categories.length) || (editable && !data.media.iframe)
+          .data_footage_video_wrapper
+            h3=__("Categories")
+            if data.categories && data.categories.length && !editable
+              ul.list-inline.category_performance_item
+                each category in data.categories
+                  li.list-inline-item=category.name
+            if editable && !data.media.iframe
+              form.category-manager
+                input(type="hidden" name="id" value=data._id)
+                ul.list-unstyled
+                  li
+                    input.mr-2(id="DOC", name="categories[]", type="checkbox" value="5be8708afc3961000000008e", checked=data.categories.map(item => {return item._id;}).indexOf("5be8708afc3961000000008e")!==-1 ? "checked" : undefined)
+                    label(for="DOC")="DOC"
+                  li
+                    input.mr-2(id="PERFORMANCE", name="categories[]", type="checkbox" value="5be8708afc39610000000195", checked=data.categories.map(item => {return item._id;}).indexOf("5be8708afc39610000000195")!==-1 ? "checked" : undefined)
+                    label(for="PERFORMANCE")="PERFORMANCE"
+                  li
+                    input.mr-2(id="VIDEO", name="categories[]", type="checkbox" value="5be8708afc39610000000112", checked=data.categories.map(item => {return item._id;}).indexOf("5be8708afc39610000000112")!==-1 ? "checked" : undefined)
+                    label(for="VIDEO")="VIDEO"
+                  li
+                    input.mr-2(id="VJ-DJ_SET", name="categories[]", type="checkbox" value="5be8708afc39610000000218", checked=data.categories.map(item => {return item._id;}).indexOf("5be8708afc39610000000218")!==-1 ? "checked" : undefined)
+                    label(for="VJ-DJ_SET")="VJ-DJ_SET"
+              form.exclude-manager
+                input(type="hidden" name="id" value=data._id)
+                ul.list-unstyled
+                  li
+                    input.mr-2(id="vjtv_exclude", name="vjtv_exclude", type="checkbox" value="1", checked=data.vjtv_exclude==1 ? "checked" : undefined)
+                    label(for="vjtv_exclude")
+                      b="VJ TV EXCLUDE"
+        if data.tags
+          .data_footage_video_wrapper
+            h3=__("Tags")
+            ul.list-inline.category_performance_item
+              each tag in data.tags
+                li.list-inline-item=tag.tag
+        if data.about
+          .data_footage_video_wrapper
+            h3=__("About")
+            .pt-2.pb-2!=data.about
+        .data_footage_video_wrapper
+          h3=__("Author")
+          each user in data.users
+            .users_video_item_wrapper
+              .media
+                a.mr-3(href="/"+user.slug+"/")
+                  img(class=user.imageFormats.small.substring(user.imageFormats.small.lastIndexOf(".")+1), src=user.imageFormats.small, alt=user.stagename)
+                .media-body
+                  p.users_performance_item_name
+                    a.mr-3(href="/"+user.slug+"/")=user.stagename
+                  if user.addressesFormatted && user.addressesFormatted.length
+                    p.users_performance_item_country!=user.addressesFormatted.join(", ")
+
+
+      
+    if data.events && data.events.length 
+      h2.mt-5.main_title.indented_title.color1=__("Events")
+      .row.mb-5
+        each item in data.events
+          .col-md-4
+            include ../partials/boxEvent
+    if data.performances && data.performances.length 
+      h2.mt-5.main_title.indented_title.color1=__("Performances")
+      .row.mb-5
+        each item in data.performances
+          .col-md-4
+            include ../partials/boxPerformance
+

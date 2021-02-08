@@ -1,0 +1,77 @@
+extends ../../layout_admin
+block topmenu
+  include topmenu
+block content
+  include ./_filters
+  .white-content
+    table.table
+      thead
+        tr
+          th="ID"
+          th="Stagename"
+          th="Crew"
+          th="Name"
+          th="Surame"
+          th="Packages"
+          - for(let a=0;a<=data.daysN;a++)
+            - var d = new Date(data.days[0])
+            - var dd = new Date(d.setDate(d.getDate() + a))
+            th=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][dd.getMonth()]+" "+dd.getDate()
+          th="Room"
+          th="Time"
+          th="Day"
+      tbody
+        - var conta = 0
+        each subscription, index in data.subscriptions
+          - conta++
+          tr
+            td=conta
+            td=subscription.subscription.subscriber_id.stagename
+            td
+              each performance in subscription.performances
+                each user in performance.users
+                  if user.is_crew && user.members.indexOf(subscription.subscription.subscriber_id._id)!=-1
+                    b!=user.stagename
+                    br
+            td=subscription.subscription.subscriber_id.name
+            td=subscription.subscription.subscriber_id.surname
+            td
+                each pack in subscription.subscription.packages
+                  if pack.options_name == "T-Shirt Size"
+                      if pack.option
+                        !=pack.option
+                      else
+                        .badge.badge-danger="MISSING"
+
+                //pre=subscription.packages
+            - for(let a=0;a<=data.daysN;a++)
+              - var d = new Date(data.days[0])
+              - var dd = new Date(d.setDate(d.getDate() + a))
+              - var present = "#FFFFFF"
+              - for(let b=0;b<subscription.subscription.days.length;b++) {
+              -   var ddd = new Date(subscription.subscription.days[b])
+              -   if (ddd.toString() == dd.toString()) present = "#d8d8d8"
+              - }
+              td
+                .mb-1.ml-1.mr-1.mt-1(style="background-color:"+present+";color:"+present)=present=="#d8d8d8" ? "X" : ""
+            td
+              .mb-1
+                each performance in subscription.performances
+                  if performance.schedule
+                    each schedule in performance.schedule
+                      div
+                        !=schedule.venue.room.replace("Piazza Orazio Giustiniani", "Piazza").replace("Meeting Area Lectures", "Meeting Area").replace(" Sets", "")
+            td
+              .mb-1
+                each performance in subscription.performances
+                  if performance.schedule
+                    each schedule in performance.schedule
+                      div
+                        !=schedule.starttimeTime
+            td
+              .mb-1
+                each performance in subscription.performances
+                  if performance.schedule
+                    each schedule in performance.schedule
+                      div
+                        !=schedule.starttimeDay
