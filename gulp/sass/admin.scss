@@ -2,6 +2,15 @@
 @import "./includes_admin/jquery-ui.scss";
 @import "./includes_admin/BsMultiSelect.min.scss";
 @import "./includes_admin/bootstrap-table.min.scss";
+@import "./includes_admin/dropzone.min.scss";
+
+
+.myDropzone {
+  min-height: 150px;
+  border: 0;
+  background: none;
+  padding: 0;
+}
 /*$brand-primary: #007bff;
 $border-radius: 3px;
 */
@@ -89,11 +98,6 @@ $input-color-placeholder: $gray-light;
   }
   legend {
     font-size: 1.25rem;
-  }
-  label {
-    color: $gray-light;
-    margin-bottom: 0.2rem;
-    //font-size: 0.8rem;
   }
   .list-group-item {
     background-color: transparent;
@@ -270,6 +274,7 @@ textarea#styled {
 .labelField {
   color: #636c72;
   font-weight: 600;
+  line-height: 1.5;
 }
 .labelField p {
   margin-right: 10px;
@@ -330,6 +335,7 @@ textarea#styled {
 .enableBorder {
   border: 1px solid rgba(0, 0, 0, 0.15);
   padding: 10px;
+  pointer-events: none;
 }
 .CrewTable a img {
   display: inline-block;
@@ -512,31 +518,9 @@ div.ReactTags__selected a.ReactTags__remove {
 .react-datepicker__input-container {
   width: 100%;
 }
-.form-group input {
-  //width: 100%;
+.datetimeEntry-control {
+  margin-top: 8px;
 }
-.ReactCollapse--content p {
-  color: #fff;
-}
-.signup-jumbotron {
-  padding: 4rem 2rem;
-  margin-bottom: 2rem;
-}
-.signup-container {
-  font-family: "Montserrat", sans-serif;
-  background-color: #303030;
-  color: #fff;
-  line-height: 1.8;
-}
-.labelFieldSignup {
-  color: #fff;
-  font-weight: 400;
-}
-.labelSignup {
-  color: #fff;
-  font-size: 24px;
-}
-
 .is-open {
   z-index: 100 !important;
 }

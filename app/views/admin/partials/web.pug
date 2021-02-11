@@ -1,0 +1,20 @@
+.form-group
+	label.labelField=__("Web")
+	#web
+		//
+		- if (!data.web || !data.web.length) {
+		-  data.web = []
+		-  data.web.url = ""
+		- }
+		each item, i in data.web
+			.mb-3
+				.input-group
+					input.form-control(type='text' name='web['+i+'][url]' placeholder=__("Web") value=item.url)
+					.input-group-append
+						button.btn.btn-danger(type='button' onclick="$(this).parent().parent().parent().remove()")
+							i.fa.fa-trash(data-toggle='tooltip' data-placement='top')
+	button.mb-2.btn.btn-success.btn-sm.duplicator(type='button' data-duplicate="web")
+		i.fa.fa-plus(data-toggle='tooltip' data-placement='top')
+		!=" "
+		b=__("ADD WEB")
+

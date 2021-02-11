@@ -3,7 +3,7 @@ let config = require('getconfig');
 let helpers = require('./helpers');
 
 const mongoose = require('mongoose');
-const request = require('axios');
+const request = require('request');
 
 const Models = {
   'User': mongoose.model('User'),
@@ -17,7 +17,7 @@ const Models = {
 }
 const logger = require('../../../utilities/logger');
 
-router.putData = (req, res) => {
+router.putData = (req, res, view) => {
   logger.debug('putData');
   logger.debug(req.body);
   if (config.cpanel[req.params.sez] && config.cpanel[req.params.sez].forms[req.params.form]) {
@@ -63,7 +63,19 @@ router.putData = (req, res) => {
           if (helpers.editable(req, data, id)) {
             data.save((err) => {
               if (err) {
-                res.status(400).send(err);
+                if (view == "json") {
+                  res.status(400).send({ message: `${JSON.stringify(err)}` });
+                } else {
+                  req.flash('errors', {msg: err.message});
+                  res.status(400).render(view, {
+                    title: view,
+                    scripts: [],
+                    currentUrl: req.originalUrl,
+                    get: req.params,
+                    err: err,
+                    data: data
+                  });
+                }
               } else {
                 logger.debug('USERS ?');
                 logger.debug(data.users);
@@ -82,14 +94,39 @@ router.putData = (req, res) => {
                   .populate(populate)
                   .exec((err, data) => {
                     if (err) {
-                      res.status(500).send({ message: `${JSON.stringify(err)}` });
+                      if (view == "json") {
+                        res.status(500).send({ message: `${JSON.stringify(err)}` });
+                      } else {
+                        req.flash('errors', {msg: `${JSON.stringify(err)}`});
+                        res.status(500).render(view, {
+                          title: view,
+                          scripts: [],
+                          currentUrl: req.originalUrl,
+                          msg_tmp: { message: `${JSON.stringify(err)}` }
+                        });
+                      }
                     } else {
                       if (!data) {
-                        res.status(404).send({ message: `DOC_NOT_FOUND` });
+                        if (view == "json") {
+                          res.status(404).send({ message: `DOC_NOT_FOUND` });
+                        } else {
+                          res.status(404).render('404', {path: req.originalUrl, title:__("404: Page not found"), titleicon:"lnr-warning"});
+                        }  
                       } else {
                         let send = {_id: data._id};
                         for (const item in config.cpanel[req.params.sez].forms[req.params.form].select) send[item] = data[item];
-                        res.json(send);
+                        if (view == "json") {
+                          res.json(send);
+                        } else {
+                          res.render(view, {
+                            title: view,
+                            scripts: [],
+                            currentUrl: req.originalUrl,
+                            get: req.params,
+                            msg_tmp: { }, 
+                            data: send
+                          });
+                        }  
                         /* if (data.emails && data.emails.filter(item => item.mailinglists) && data.emails.filter(item => item.mailinglists).length) {
                           router.updateSendy(data, req, (err) => {
                             let send = {_id: data._id};
@@ -102,22 +139,35 @@ router.putData = (req, res) => {
                     }
                   });
                 });
-  
-
-
-
-
               }
             });
           } else {
-            res.status(404).send({ message: `DOC_NOT_OWNED` });
+            if (view == "json") {
+              res.status(404).send({ message: `DOC_NOT_OWNED` });
+            } else {
+              res.status(404).render('404', {path: req.originalUrl, title:__("404: Page not found"), titleicon:"lnr-warning"});
+            }  
           }
 
         } else {
-          res.status(404).send({ message: `DOC_NOT_FOUND` });
+          if (view == "json") {
+            res.status(404).send({ message: `DOC_NOT_FOUND` });
+          } else {
+            res.status(404).render('404', {path: req.originalUrl, title:__("404: Page not found"), titleicon:"lnr-warning"});
+          }  
         }
       } else {
-        res.status(500).send({ message: `${JSON.stringify(err)}` });
+        if (view == "json") {
+          res.status(500).send({ message: `${JSON.stringify(err)}` });
+        } else {
+          req.flash('errors', {msg: `${JSON.stringify(err)}`});
+          res.status(500).render(view, {
+            title: view,
+            scripts: [],
+            currentUrl: req.originalUrl,
+            msg_tmp: { message: `${JSON.stringify(err)}` }
+          });
+        }
       }
     });
   } else {

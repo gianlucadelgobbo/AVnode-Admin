@@ -200,7 +200,10 @@ pre {
 .jumbotron {
   color: $color4;
 }
-
+.labelSignup {
+  color: #fff;
+  font-size: 24px;
+}
 nav.navbar {
   z-index: 2;
 }
@@ -2117,8 +2120,7 @@ span.seeall_label {
 }
 
 textarea.form-control {
-  height: auto;
-  width: 60%;
+  min-height: 286px;
 }
 .vjs-modal-dialog-content .form-control {
   display: inline;

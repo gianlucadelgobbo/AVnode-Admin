@@ -1,0 +1,18 @@
+#addresses.form-group
+	label.labelField(for='slug')=__("City, country")
+	.addresses
+		each address, i in data.addresses
+			.mb-3
+				.input-group
+					input.form-control.location-search-input(type='text' name='addresses['+i+'][formatted_address]' autocomplete='off' role='combobox' aria-autocomplete='list' aria-expanded='false' placeholder='City, country' value=address.formatted_address)
+					input.lat(type='hidden' name='addresses['+i+'][geometry][lat]' value=address.geometry.lat)
+					input.lng(type='hidden' name='addresses['+i+'][geometry][lng]' value=address.geometry.lng)
+					input.locality(type='hidden' name='addresses['+i+'][locality]' value=address.locality)
+					input.country(type='hidden' name='addresses['+i+'][country]' value=address.country)
+					.input-group-append
+						button.btn.btn-danger(type='button')
+							i.fa.fa-trash(data-toggle='tooltip' data-placement='top')
+	button.mb-2.btn.btn-success.btn-sm.duplicator(type='button' data-duplicate="addresses")
+		i.fa.fa-plus(data-toggle='tooltip' data-placement='top')
+		!=" "
+		b=__("ADD CITY")

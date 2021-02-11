@@ -14,6 +14,8 @@ if (process.env.DEBUG) {
   });
 }
 
+
+
 // PROFILE GET
 router.get('/profile/public/slugs/:slug', (req, res)=>{
   req.params.id = req.user.id;
@@ -28,7 +30,7 @@ router.get('/setstatsandactivity/:id', (req, res)=>{
 router.get('/profile/:form/', (req, res) => {
   req.params.id = req.user.id;
   req.params.sez = 'profile';
-  get.getData(req, res);
+  get.getData(req, res, "json");
 });
 
 router.get('/profile/emails/verify/:email', (req, res)=>{
@@ -73,7 +75,7 @@ router.get('/:sez/:id/duplicate', (req, res) => {
 });
 
 router.get('/:sez/:id/:form/', (req, res) => {
-  get.getData(req, res);
+  get.getData(req, res, "json");
 });
 
 // UTILITIES
@@ -162,7 +164,7 @@ router.get('/loggeduser', (req, res) => {
 
 router.get('/:sez', (req, res) => {
   req.params.id = req.user.id;
-  get.getList(req, res);
+  get.getList(req, res, "json");
 });
 /* 
 router.get('/subscriptions', (req, res) => {
@@ -230,9 +232,6 @@ router.post('/partners/contacts/delete/', (req, res) => {
 });
 
 
-router.post('/:ancestor/:id/:sez/', (req, res) => {
-  post.postData(req, res);
-});
 
 /* router.post('/performances/:id/videos', (req, res)=>{
   req.params.model = 'Performance';
@@ -287,6 +286,31 @@ router.post('/bookingrequest', (req, res)=>{
 router.post('/contact', (req, res)=>{
   post.contact(req, res);
 });
+
+/* router.post('/:ancestor/:id/:sez/', (req, res) => {
+  post.postData(req, res);
+});
+ */
+router.post('/:sez/:id/:form/', (req, res) => {
+  console.log("req.bodyreq.bodyreq.bodyreq.bodyreq.bodyreq.body")
+  console.log(req.body)
+  if (['profile/image','crews/image','events/image','news/image','performances/image','footage/media','galleries/medias','videos/video'].indexOf(req.params.sez+'/'+req.params.form)!== -1) {
+    req.params.comp = ['footage/media','videos/video'].indexOf(req.params.sez+'/'+req.params.form)!== -1 ? "media" : ['galleries/medias'].indexOf(req.params.sez+'/'+req.params.form)!== -1 ? "image" : req.params.form;
+    upload.uploader(req, res, (err, data) => {
+      if (!data) {
+        console.log("stocazzo2")
+        res.status(500).send(err);
+      } else {
+        console.log("stocazzo")
+        for (const item in data) req.body[item] = data[item];
+        put.putData(req, res, "json");
+      }
+    });
+  } else {
+    put.putData(req, res, "json");
+  }
+});
+
 /* router.put('/profile/:form/', (req, res) => {
   req.params.id = req.user.id;
   req.params.sez = 'profile';
@@ -305,20 +329,5 @@ router.post('/contact', (req, res)=>{
   }
 }); */
 
-router.put('/:sez/:id/:form/', (req, res) => {
-  if (['profile/image','crews/image','events/image','news/image','performances/image','footage/media','galleries/medias','videos/video'].indexOf(req.params.sez+'/'+req.params.form)!== -1) {
-    req.params.comp = ['footage/media','videos/video'].indexOf(req.params.sez+'/'+req.params.form)!== -1 ? "media" : ['galleries/medias'].indexOf(req.params.sez+'/'+req.params.form)!== -1 ? "image" : req.params.form;
-    upload.uploader(req, res, (err, data) => {
-      if (!data) {
-        res.status(500).send(err);
-      } else {
-        for (const item in data) req.body[item] = data[item];
-        put.putData(req, res);
-      }
-    });
-  } else {
-    put.putData(req, res);
-  }
-});
 
 module.exports = router;

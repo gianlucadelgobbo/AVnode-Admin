@@ -314,13 +314,13 @@ router.removeImage = (req, res) => {
     gallery.stats.img = gallery.medias.length;
     gallery.save(function(err){
       req.params.form = 'public';
-      router.getData(req, res);
+      router.getData(req, res, "json");
     });
   });
 
 /*   Models[config.cpanel[req.params.sez].model].update( query , { $pull: {"medias": {"slug": req.params.image } } }, function(err){
     req.params.form = 'public';
-    router.getData(req, res);
+    router.getData(req, res, "json");
   }); */
 
 }
@@ -418,7 +418,7 @@ router.removeFootage = (req, res) => {
               } else {
                 req.params.sez = 'playlists';
                 req.params.form = 'public';
-                router.getData(req, res);
+                router.getData(req, res, "json");
               }
             });
           });
@@ -470,7 +470,7 @@ router.getSubscriptions = (req, res) => {
   }
 }
 
-router.getList = (req, res) => {
+router.getList = (req, res, view) => {
   if (config.cpanel[req.params.sez] && req.params.id) {
     const select = req.query.pure ? config.cpanel[req.params.sez].list.select : Object.assign(config.cpanel[req.params.sez].list.select, config.cpanel[req.params.sez].list.selectaddon);
     const populate = req.query.pure ? [] : config.cpanel[req.params.sez].list.populate;
@@ -484,20 +484,41 @@ router.getList = (req, res) => {
     .sort({createdAt:-1})
     .exec((err, data) => {
       if (err) {
-        res.status(500).send({ message: `${JSON.stringify(err)}` });
+        if (view == "json") {
+          res.status(500).send({ message: `${JSON.stringify(err)}` });
+        } else {
+          res.status(404).render('404', {path: req.originalUrl, title:__("404: Page not found"), titleicon:"lnr-warning"});
+        }
       } else {
         let send = JSON.parse(JSON.stringify(req.user));
         send[req.params.sez] = data;
         //for (const item in config.cpanel[req.params.sez].list.select) send[item] = data[item];
-        res.json(send);
+        if (view == "json") {
+          res.json(send);
+        } else {
+          res.render(view, {
+            title: view,
+            scripts: [],
+            currentUrl: req.originalUrl,
+            get: req.params,
+            msg_tmp: { }, 
+            data: send
+          });
+        }  
       }
     });
   } else {
-    res.status(404).send({ message: `API_NOT_FOUND` });
+    if (view == "json") {
+      res.status(404).send({ message: `API_NOT_FOUND` });
+    } else {
+      res.status(404).render('404', {path: req.originalUrl, title:__("404: Page not found"), titleicon:"lnr-warning"});
+    }  
   }
 }
 
 router.getData = (req, res, view) => {
+  console.log("getDatagetDatagetDatagetDatagetData");
+  console.log(config.cpanel[req.params.sez] && config.cpanel[req.params.sez].forms[req.params.form]);
   if (config.cpanel[req.params.sez] && config.cpanel[req.params.sez].forms[req.params.form]) {
     const id = req.params.id;
     const select = req.query.pure ? config.cpanel[req.params.sez].forms[req.params.form].select : Object.assign(config.cpanel[req.params.sez].forms[req.params.form].select, config.cpanel[req.params.sez].forms[req.params.form].selectaddon);
@@ -512,31 +533,18 @@ router.getData = (req, res, view) => {
       console.log(err || data)
       if (err) {
         if (view == "json") {
-          res.status(404).send({ message: `${JSON.stringify(err)}` });
+          res.status(500).send({ message: `${JSON.stringify(err)}` });
         } else {
-          req.flash('errors', {msg: `${JSON.stringify(err)}`});
-          res.status(404).render(view, {
-            title: view,
-            scripts: [],
-            currentUrl: req.originalUrl,
-            msg_tmp: { message: `${JSON.stringify(err)}` }
-          });
+          res.status(404).render('404', {path: req.originalUrl, title:__("404: Page not found"), titleicon:"lnr-warning"});
         }
       } else {
         if (!data) {
           if (view == "json") {
             res.status(404).send({ message: `DOC_NOT_FOUND` });
           } else {
-            req.flash('errors', {msg: `DOC_NOT_FOUND`});
-            res.status(404).render(view, {
-              title: view,
-              scripts: [],
-              currentUrl: req.originalUrl,
-              msg_tmp: { message: `DOC_NOT_FOUND` }
-            });
+            res.status(404).render('404', {path: req.originalUrl, title:__("404: Page not found"), titleicon:"lnr-warning"});
           }  
         } else {
-          console.log(data);
           if (helpers.editable(req, data, id)) {
             let send = {_id: data._id};
             for (const item in config.cpanel[req.params.sez].forms[req.params.form].select) send[item] = data[item];
@@ -547,6 +555,7 @@ router.getData = (req, res, view) => {
                 title: view,
                 scripts: [],
                 currentUrl: req.originalUrl,
+                get: req.params,
                 msg_tmp: { }, 
                 data: send
               });
@@ -556,20 +565,18 @@ router.getData = (req, res, view) => {
             if (view == "json") {
               res.status(404).send({ message: `DOC_NOT_OWNED` });
             } else {
-              req.flash('errors', {msg: `DOC_NOT_OWNED`});
-              res.status(404).render(view, {
-                title: view,
-                scripts: [],
-                currentUrl: req.originalUrl,
-                msg_tmp: { message: `DOC_NOT_OWNED` }
-              });
+              res.status(404).render('404', {path: req.originalUrl, title:__("404: Page not found"), titleicon:"lnr-warning"});
             }  
           }
         }
       }
     });
   } else {
-    res.status(404).send({ message: `API_NOT_FOUND` });
+    if (view == "json") {
+      res.status(404).send({ message: `API_NOT_FOUND` });
+    } else {
+      res.status(404).render('404', {path: req.originalUrl, title:__("404: Page not found"), titleicon:"lnr-warning"});
+    }  
   }
 }
 
@@ -1088,7 +1095,7 @@ router.addMember = (req, res) => {
               } else {
                 req.params.sez = 'crews';
                 req.params.form = 'members';
-                router.getData(req, res);
+                router.getData(req, res, "json");
               }
             });              
           }
@@ -1191,7 +1198,7 @@ router.removeMember = (req, res) => {
               } else {
                 req.params.sez = 'crews';
                 req.params.form = 'members';
-                router.getData(req, res);
+                router.getData(req, res, "json");
               }
             });
           });
@@ -1273,7 +1280,7 @@ router.addUser = (req, res) => {
                 ).then( (results) => {
                   //res.json(item);
                   req.params.form = 'public';
-                  router.getData(req, res);
+                  router.getData(req, res, "json");
                 });
               
               }
@@ -1374,7 +1381,7 @@ router.removeUser = (req, res) => {
                   [helpers.setStatsAndActivity(query)]
                 ).then( (results) => {
                   req.params.form = 'public';
-                  router.getData(req, res);
+                  router.getData(req, res, "json");
                 });
               }
             });
@@ -1469,13 +1476,13 @@ router.eventAddPerformance = (req, res) => {
                       } else {
                         req.params.sez = 'events';
                         req.params.form = 'program';
-                        router.getData(req, res);            
+                        router.getData(req, res, "json");            
                       }
                     });
                   } else {
                     req.params.sez = 'events';
                     req.params.form = 'program';
-                    router.getData(req, res);            
+                    router.getData(req, res, "json");            
                   }
                 });
               }
@@ -1564,7 +1571,7 @@ router.eventRemovePerformance = (req, res) => {
                   } else {
                     req.params.sez = 'events';
                     req.params.form = 'program';
-                    router.getData(req, res);            
+                    router.getData(req, res, "json");            
                   }
                 });
               }
@@ -1660,13 +1667,13 @@ router.performanceAddEvent = (req, res) => {
                       } else {
                         req.params.sez = 'events';
                         req.params.form = 'program';
-                        router.getData(req, res);            
+                        router.getData(req, res, "json");            
                       }
                     });
                   } else {
                     req.params.sez = 'events';
                     req.params.form = 'program';
-                    router.getData(req, res);            
+                    router.getData(req, res, "json");            
                   }
                 });
               }
@@ -1755,7 +1762,7 @@ router.performanceRemoveEvent = (req, res) => {
                   } else {
                     req.params.sez = 'events';
                     req.params.form = 'program';
-                    router.getData(req, res);            
+                    router.getData(req, res, "json");            
                   }
                 });
               }
@@ -1948,7 +1955,7 @@ router.addGallery = (req, res) => {
                 } else {
                   req.params.sez = 'events';
                   req.params.form = 'galleries';
-                  router.getData(req, res);            
+                  router.getData(req, res, "json");            
                 }
               });
             });
@@ -2032,7 +2039,7 @@ router.removeGallery = (req, res) => {
                 } else {
                   req.params.sez = 'events';
                   req.params.form = 'galleries';
-                  router.getData(req, res);            
+                  router.getData(req, res, "json");            
                 }
               });
             });
@@ -2117,7 +2124,7 @@ router.addVideo = (req, res) => {
                   res.status(404).send({ message: err });
                 } else {
                   req.params.form = 'videos';
-                  router.getData(req, res);            
+                  router.getData(req, res, "json");            
                 }
               });
             });
@@ -2208,7 +2215,7 @@ router.removeVideo = (req, res) => {
               } else {
                 req.params.sez = 'events';
                 req.params.form = 'videos';
-                router.getData(req, res);            
+                router.getData(req, res, "json");            
               }
             });
           });

@@ -1,0 +1,70 @@
+extends ../layout_admin
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pt-3.pb-2.mb-3.border-bottom
+    h1.h2=data.stagename
+    .btn-toolbar.mb-2.mb-md-0.d-print-none.text-right
+      a.btn.btn-primary(href='/'+data.slug)=__("SHOW")
+  include partials/menuobj
+  h3.labelField.mb-3=__(config.cpanel[get.sez].title)+" "+__(config.cpanel[get.sez].forms[get.form].title)
+  form(method="post")
+      .card
+        .card-header
+          h4
+            .labelField Emails
+          button.float-right.mb-2.btn-sm.btn.btn-success(type='button')
+            i.fa.fa-plus(data-toggle='tooltip' data-placement='top')
+        .card-body
+          br
+          .container-fluid.even
+            .row
+              .col-md-5.offset-1
+                div
+                  .input-group
+                    input.form-control(type='email' name='emails[0].email' placeholder='Emails' aria-describedby='slugHelpInline' value='g.delgobbo@liveperformersmeeting.net' disabled='')
+              .col-md-5
+                .row
+                  .col-md-4
+                    .form-check
+                      input.form-check-input(type='checkbox' name='emails[0].is_public' value='false')
+                      label.form-check-label
+                        span Is public
+                  .col-md-4
+                    .form-check
+                      input.form-check-input(type='checkbox' name='emails[0].is_primary' value='true')
+                      label.form-check-label
+                        div(data-tip='To set as primary, confirm the email first' currentitem='false')
+                          | Is primary
+                          .__react_component_tooltip.place-top.type-dark(data-id='tooltip')
+                  .col-md-4
+                    .form-group
+                      span.badge.badge-success Is confirmed
+              .col-md-1
+                button.btn.btn-danger(type='button')
+                  i.fa.fa-trash(data-toggle='tooltip' data-placement='top')
+            .row
+              .col-sm-11.offset-1.email-subscriptions
+                span Subscriptions
+                .row
+                  .col-md-3
+                    .form-check
+                      input.form-check-input(type='checkbox' name='emails[0].mailinglists.flxer' value='false')
+                      label.form-check-label
+                        div FLxER
+                  .col-md-3
+                    .form-check
+                      input.form-check-input(type='checkbox' name='emails[0].mailinglists.flyer' value='false')
+                      label.form-check-label
+                        div Flyer
+                  .col-md-3
+                    .form-check
+                      input.form-check-input(type='checkbox' name='emails[0].mailinglists.livevisuals' value='false')
+                      label.form-check-label
+                        div Live Visuals
+                  .col-md-3
+                    .form-check
+                      input.form-check-input(type='checkbox' name='emails[0].mailinglists.updates' value='false')
+                      label.form-check-label
+                        div Updates
+            hr
+      hr
+      button.btn.btn-primary.btn-lg.btn-block(type='submit') Save

@@ -1,259 +1,34 @@
 extends ../layout_admin
 block content
-  div
-    .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pt-3.pb-2.mb-3.border-bottom
-      h1.h2 Gianluca Del Gobbo
-      .btn-toolbar.mb-2.mb-md-0.d-print-none.text-right
-        a.btn.btn-primary(href='/gianlucadelgobbo')
-          span SHOW
-    nav
-      a.btn.btn-primary.btn-sm.mr-3.disabled(aria-current='true' href='/admin/profile/5be881a7fc3961000000b69b/public')
-        span Public data
-      a.btn.btn-primary.btn-sm.mr-3(aria-current='false' href='/admin/profile/5be881a7fc3961000000b69b/images')
-        span Image
-      a.btn.btn-primary.btn-sm.mr-3(aria-current='false' href='/admin/profile/5be881a7fc3961000000b69b/emails')
-        span Emails
-      a.btn.btn-primary.btn-sm.mr-3(aria-current='false' href='/admin/profile/5be881a7fc3961000000b69b/private')
-        span Private data
-      a.btn.btn-primary.btn-sm.mr-3(aria-current='false' href='/admin/profile/5be881a7fc3961000000b69b/password')
-        span Password
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pt-3.pb-2.mb-3.border-bottom
+    h1.h2=data.stagename
+    .btn-toolbar.mb-2.mb-md-0.d-print-none.text-right
+      a.btn.btn-primary(href='/'+data.slug)=__("SHOW")
+  include partials/menuobj
+  h3.labelField.mb-3=__(config.cpanel[get.sez].title)+" "+__(config.cpanel[get.sez].forms[get.form].title)
+  form(method="post")
+    .row
+      .col-md-7
+        .form-group
+          label.labelField(for='stagename')=__("Stage Name")
+          input.form-control(type='text' name='stagename' id='stagename' placeholder=__("Stage Name") value=data.stagename)
+          if err && Object.keys(err.errors).indexOf('stagename')!==-1
+            .error-message=err.errors.stagename.message
+        - var slugtitle = __("Profile Url")
+        - var slugplaceholder = __("Profile Url")
+        - var slughelptext = __("To have your profile at https://avnode.net/mybeautyfulprofile, please insert mybeautifulprofile (lower case, no spaces, no special characters)")
+        include partials/slug
+        
+        include partials/is_public
+        
+        include partials/addresses
+
+
+      .col-md-5
+        include partials/image
+    include partials/abouts
+    include partials/social
+    include partials/web
+
     hr
-    h3.labelField.mb-3
-      span PROFILE PUBLIC DATA
-    form
-      dl.row
-        dt.col-sm-2
-          .labelField Stage Name
-        dd.col-sm-10.mb-4
-          div
-            .input-group
-              input.form-control(type='text' name='stagename' placeholder='Stage Name' aria-describedby='slugHelpInline' value='Gianluca Del Gobbo')
-      dl.row
-        dt.col-sm-2
-          .labelField Profile Url
-        dd.col-sm-10.mb-4
-          div
-            .input-group
-              .input-group-prepend
-                span.input-group-text https://avnode.net/
-              input.form-control(type='text' name='slug' placeholder='Profile Url' aria-describedby='slugHelpInline' value='gianlucadelgobbo')
-            small#slugHelpInline.help
-              | To have your profile at https://avnode.net/mybeautyfulprofile, please insert mybeautifulprofile (lower case, no spaces, no special characters)
-      dl.row
-        dt.col-sm-2
-          .labelField Is Public
-        dd.col-sm-10
-          .form-check
-            input.form-check-input(type='checkbox' name='is_public' value='true')
-      br
-      div
-        .card-header
-          h4
-            .labelField About
-        div
-          br
-          ul.nav.nav-tabs.justify-content-center(role='tablist')
-            li.nav-item
-              a.nav-link.active(data-toggle='tab' role='tab' href='#' data-target='#tabs-944836417230205400') English
-            li.nav-item
-              a.nav-link(data-toggle='tab' role='tab' href='#' data-target='#tabs-944836417230205401') Беларус*
-            li.nav-item
-              a.nav-link(data-toggle='tab' role='tab' href='#' data-target='#tabs-944836417230205402') Deutsche*
-            li.nav-item
-              a.nav-link(data-toggle='tab' role='tab' href='#' data-target='#tabs-944836417230205403') Español*
-            li.nav-item
-              a.nav-link(data-toggle='tab' role='tab' href='#' data-target='#tabs-944836417230205404') Français*
-            li.nav-item
-              a.nav-link(data-toggle='tab' role='tab' href='#' data-target='#tabs-944836417230205405') Ελληνικά*
-            li.nav-item
-              a.nav-link(data-toggle='tab' role='tab' href='#' data-target='#tabs-944836417230205406') Magyar*
-            li.nav-item
-              a.nav-link(data-toggle='tab' role='tab' href='#' data-target='#tabs-944836417230205407') Italiano
-            li.nav-item
-              a.nav-link(data-toggle='tab' role='tab' href='#' data-target='#tabs-944836417230205408') Polski*
-            li.nav-item
-              a.nav-link(data-toggle='tab' role='tab' href='#' data-target='#tabs-944836417230205409') Português*
-            li.nav-item
-              a.nav-link(data-toggle='tab' role='tab' href='#' data-target='#tabs-9448364172302054010') русский*
-          .tab-content
-            #tabs-944836417230205400.tab-pane.container.show.active(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[0].value' style='height: 2726px;')
-                  | Promoter, producer, coder, networks enthusiast is considered a guru of the new media and the digital arts world as well as a pioneer in the Audio Visual Performing Arts, he was born in Rome in 1970.
-                  | Very interested in any kind of avant-garde, costume, music, art and experimentation, it is updated on all sorts of innovation in art, technology and communication.
-                  | In 1996, with a background in house party organization from 1988, he founded and coordinates the various activities of Flyer Communication as well the managerial tasks and strategic development of all projects of the company that now have a leadership in new media communication services with 2 spin off, Web Environments and Audio Visual Performing Arts.
-                  | In 1999 he founded Shockart.net that quickly becomes a point of reference for the Web Art and especially for the productions in Shockwave Flash, features exhibitions in Rome, Valencia, San Francisco and New York.
-                  | In 2001 he created the AV mixer FLxER, that is presented in the most varied occasions, it is used to mix vector graphics, audio, video, text and interactive media, in live performance. FLxER is one of the first vj software for a Audio Visual Performing Arts, is free and community based. FLxER is today the biggest network of Audio Visuals artists and VJs linked together from the interest for the Audio Visual Performing Arts and first of all the sharing of knowledge.
-                  | With FLxER he became a code/hacker extending his knowledge on many other languages, softwares, platforms and os related with web, datas and new media.
-                  | From 2002 to 2013 taught at the IED as teacher in the Master in Web Design and Strategy, and in 2006 taught “Flash” in the course of Graphics for three years.
-                  | In 2003 started to work to the creation of a permanent center for new media art in Rome, WAM Web Art Mouseum.
-                  | In 2004 he create LPM Live Performers Meeting, the meeting in one place for 4 days of the people in connection trough the FLxER community. From 2004 to today (2017) LPM hosted 3.501 Artists from 72 countries with editions all around the world is today the biggest AV event.
-                  | In 2004 he won the prize Bardi IBM Web award with the site of the Photograpy International Festival of Rome in the same year he started writing for Next Exit magazine and others on the Web.
-                  | In 2006, Achille Bonito Oliva gives the ABO Silver, an award for having outstanding accomplishments of Web Art, as one of the protagonists of international contemporary art.
-                  | In 2007 is one of the founders of the Free Hardware Foundation an institution based on the dissemination of the free hardware philosophy. Gianluca is now the secretary of the Free Hardware Foundation.
-                  | In 2008 LPM starts to be supported from various local Grant for culture.
-                  | In 2009 from the community of FLxER VJ Television was born the first 24-hour live video broadcast channel.
-                  | Since 2010 is president of the Linux Club italia.
-                  | In 2011 he started to work to AVnode network with the aim to put in connection and share experiences and tools between organizations active in the Audio Visual Performing Arts. At the same time AVnode will be for the artists the biggest AV community inherit the 25.000 artists of the FLxER community.
-                  | In 2011, 2012 and 2013 LPM is supported from the Culture Programme of the EU with the strand for Third Countries making 6 editions 3 in Europe and 3 in Belarus, Mexico and South Africa with hundreds of satellite events.
-                  | In 2013 started a study about a new hardware for audio visuals performances LPVR Live Performers Video Router.
-                  | In 2014 he founded the Live Cinema Festival a live performing exhibition that explores and promotes all the artistic trends whom is attributed the term “Live Cinema”, with performances by artists which have made this narrative technique their stylistic code.
-                  | In 2014 he started as teacher at Quasar University with a course on events management.
-                  | In 2016 he founded the Chromosphere an event on 360 projections inside domes.
-                  | In 2015 is project leader of LPM 2015 > 2018, large scale cooperation project of the Creative Europe Culture Programme of the EU with 14 partners from 13 countries; Austria, Belgium, Czech Republic, France, Germany, Greece, Hungary, Italy, Netherlands, Poland, Spain, Turkey and United Kingdom, aimed to promote and develop Audio Visual Performing Arts and European to worldwide audiences.
-                  | In 2016 he founded the Fotonica from photon, historically as light, from Greek φωτός (photòs), is a festival that investigates art forms related to the light element, in particular digital light.
-                  | He has also edited several lectures in the Faculty of Engineering, University of Sannio, Department of Linguistic Practices and Text Analysis at the University of Bari, in the Faculty of Humanities, University of Tor Vergata, University of Perugia , at the Biennale of Young Artists of Athens, the Flash Forward in San Francisco and New York, the Center for Studies in Szentendre (Budapest), at Sonar in Barcelona, the RESFEST of Rome, the Biennial of Valencia, the Faculty of Fine Arts in Barcelona at the Galleria d’Arte Moderna e Contemporanea di Bergamo, the Galleria d’Arte Moderna in Rome, at the Faculty of Architecture of Rome.
-                  | References:
-                  | AVnode – avnode.org
-                  | LPM Live Performers Meeting – liveperformersmeeting.net
-                  | Live Cinema Festival – livecinemafestival.com
-                  | Fotonica Festival – fotonicafestival.com
-                  | FLxER Project – flxer.net
-                  | Chromosphere – chromosphere.eu
-                  | Flyer new media – flyer.it
-                  | VJTelevision – vjtelevision.com
-                  | Linux Club Italia – linux-club.org
-                  | LPVR Live Performers Video Router – lpvr.liveperformersmeeting.net
-                  | WAM Web Art Mouseum – wam.flyer.it
-                  | Shockart.net – shockart.net
-                  | Free Hardware Foundation – www.fhf.it
-            #tabs-944836417230205401.tab-pane.container(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[1].value' style='height: 38px;')
-            #tabs-944836417230205402.tab-pane.container(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[2].value' style='height: 38px;')
-            #tabs-944836417230205403.tab-pane.container(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[3].value' style='height: 38px;')
-            #tabs-944836417230205404.tab-pane.container(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[4].value' style='height: 38px;')
-            #tabs-944836417230205405.tab-pane.container(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[5].value' style='height: 38px;')
-            #tabs-944836417230205406.tab-pane.container(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[6].value' style='height: 38px;')
-            #tabs-944836417230205407.tab-pane.container(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[7].value' style='height: 2102px;')
-                  | Promoter, producer, coder, networks enthusiast è considerato un guru dei nuovi media e del mondo delle arti digitali nonché pioniere nel mondo delle Audio Visual Performing Arts, nasce a Roma nel 1970.
-                  | Molto interessato a ogni tipo di avanguardia, costume, musica, arte e sperimentazione, è aggiornato su ogni tipo di innovazione nell’arte, nella tecnologia e nella comunicazione.
-                  | Nel 1996, con un background nell’organizzazione di house party dal 1988, fonda e coordina le varie attività di Flyer Communication, ricopre i compiti manageriali e lo sviluppo strategico di tutti i progetti dell’azienda che ora ha una leadership nei new media con 2 spin off, Web Environments e Audio Visual Performing Arts.
-                  | Nel 1999 fonda Shockart.net che diventa rapidamente un punto di riferimento per la Web Art e in particolare per le produzioni in Shockwave Flash, presenta mostre a Roma, Valencia, San Francisco e New York.
-                  | Nel 2001 crea il mixer AV FLxER, presentato nelle più svariate occasioni, utilizzato per mixare grafica vettoriale, audio, video, testo e media interattivi, in performance live. FLxER è uno dei primi software vj per le Audio Visual Performing Arts, è gratuito e basato sulla community. FLxER è oggi il più grande network di artisti e VJ di Visual Voy, legati tra loro per l’interesse per le Audio Visual Performing Arts e, innanzitutto, la condivisione del sapere.
-                  | Con FLxER diventa un programmatore / hacker che estende la sua conoscenza su molte altri linguaggi, software, piattaforme e sistemi operativi, relativi a web, dati e nuovi media.
-                  | Dal 2002 al 2013 insegna allo IED nel Master in Web Design & Strategy, e nel 2006 insegna “Flash” nel corso di grafica per tre anni.
-                  | Nel 2003 ha iniziato a lavorare alla creazione di un centro permanente per i nuovi media a Roma, WAM Web Art Mouseum.
-                  | Nel 2004 crea LPM Live Performers Meeting, la riunione in un posto per 4 giorni di persone in connessione grazie alla community di FLxER. Dal 2004 ad oggi (2018) LPM in 18 edizioni ha ospitato 6.501 artisti provenienti da 72 paesi, con edizioni in tutto il mondo è oggi il più grande evento nelle Audio Visual Performing Arts.
-                  | Nel 2004 ha vinto il premio Bardi IBM Web Award con il sito del Festival Internazionale di Fotografia di Roma nello stesso anno ha iniziato a scrivere per la rivista Next Exit e altri magazine sul web.
-                  | Nel 2006, Achille Bonito Oliva dà l’ABO Silver, un premio per le straordinarie mostre di Web Art, come uno dei protagonisti dell’arte contemporanea internazionale.
-                  | Nel 2007 è uno dei fondatori della Free Hardware Foundation un’istituzione basata sulla diffusione della filosofia hardware gratuita. Gianluca è ora il segretario della Free Hardware Foundation.
-                  | Nel 2008 LPM inizia a essere sostenuto da diversi enti locali per la cultura.
-                  | Nel 2009 dalla comunità di FLxER nasce VJ Television il primo canale di trasmissione live 24 ore su 24.
-                  | Dal 2010 è presidente del Linux Club italia.
-                  | Nel 2011 ha iniziato a lavorare alla rete AVnode con l’obiettivo di mettere in relazione e condividere esperienze e strumenti tra le organizzazioni attive nel campo delle Audio Visual Performing Arts. Allo stesso tempo AVnode sarà per gli artisti la più grande comunità AV ereditando i 25.000 artisti della comunità FLxER.
-                  | Nel 2011, 2012 e 2013, LPM è sostenuto dal Programma Cultura dell’UE nello strand per i Paesi Terzi realizzando 6 edizioni, 3 in Europa e 3 in Bielorussia, Messico e Sudafrica con centinaia di eventi satellite.
-                  | Nel 2013 ha iniziato uno studio su un nuovo hardware per le performance audio audio LPVR Live Performers Video Router.
-                  | Nel 2014 fonda il Live Cinema Festival a Roma.
-                  | Nel 2014 inizia come insegnante presso l’Università Quasar con un corso di gestione degli eventi.
-                  | Nel 2016 fonda Chromosphere, progetto sulle proiezioni in dome (cupole simili ai planetari).
-                  | Nel 2017 da vita a Fotonica Festival, progetto che, sebene sia incentrato sulle produzioni audio video, vuole indagare a 360 gradi l’aspetto luce nel contesto artistico contemporaneo.
-                  | Nel 2015 è project leader di LPM 2015 > 2018, progetto di cooperazione su larga scala del Programma Cultura Europa Creativa con 14 partner provenienti da 13 paesi; Austria, Belgio, Repubblica Ceca, Francia, Germania, Grecia, Ungheria, Italia, Paesi Bassi, Polonia, Spagna, Turchia e Regno Unito, finalizzata alla promozione e allo sviluppo delle Audio Visual Performing Arts europee a livello mondiale.
-                  | Ha inoltre curato numerose conferenze presso la Facoltà di Ingegneria dell’Università di Sannio, Dipartimento di Linguistica e Analisi del Testo presso l’Università di Bari, presso la Facoltà di Scienze Umane dell’Università di Tor Vergata, Università di Perugia, la Biennale dei Giovani Artisti di Atene, il Flash Forward a San Francisco e New York, il Centro Studi di Szentendre (Budapest), il Sonar di Barcellona, il RESFEST di Roma, la Biennale di Valencia, la Facoltà di Belle Arti di Barcellona, la Galleria d’Arte Moderna e Contemporanea di Bergamo, la Galleria d’Arte Moderna a Roma, presso la Facoltà di Architettura di Roma.
-                  | References:
-                  | AVnode – avnode.org – avnode.net
-                  | LPM Live Performers Meeting – liveperformersmeeting.net
-                  | Live Cinema Festival – livecinemafestival.com
-                  | Chromosphere Festival – chromosphere.eu
-                  | Fotonica Festival – fotonicafestival.com
-                  | FLxER Project – flxer.net
-                  | Flyer New Media – flyer.it
-                  | VJTelevision – vjtelevision.com
-                  | Fusolab 2.0
-                  | Linux Club Italia – linux-club.org
-                  | LPVR Live Performers Video Router – lpvr.liveperformersmeeting.net
-                  | WAM Web Art Mouseum wam.flyer.it
-                  | Shockart.net shockart.net
-                  | Free Hardware Foundation – www.fhf.it
-            #tabs-944836417230205408.tab-pane.container(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[8].value' style='height: 38px;')
-            #tabs-944836417230205409.tab-pane.container(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[9].value' style='height: 38px;')
-            #tabs-9448364172302054010.tab-pane.container(role='tabpanel')
-              .form-group
-                textarea.form-control(name='abouts[10].value' style='height: 38px;')
-      br
-      .card
-        .card-header
-          h4
-            .labelField Socials
-          button.float-right.mb-2.btn-sm.btn.btn-success(type='button')
-            i.fa.fa-plus(data-toggle='tooltip' data-placement='top')
-        .card-body
-          br
-          .row.mb-3
-            .col-md-9.offset-1
-              div
-                .input-group
-                  input.form-control(type='url' name='social[0].url' placeholder='Socials' aria-describedby='slugHelpInline' value='https://www.instagram.com/gianlucadelgobbo')
-            .col-md-2
-              button.btn.btn-danger(type='button')
-                i.fa.fa-trash(data-toggle='tooltip' data-placement='top')
-          .row.mb-3
-            .col-md-9.offset-1
-              div
-                .input-group
-                  input.form-control(type='url' name='social[1].url' placeholder='Socials' aria-describedby='slugHelpInline' value='https://www.facebook.com/gianlucadelgobbo')
-            .col-md-2
-              button.btn.btn-danger(type='button')
-                i.fa.fa-trash(data-toggle='tooltip' data-placement='top')
-      br
-      .card
-        .card-header
-          h4
-            .labelField Web
-          button.float-right.mb-2.btn-sm.btn.btn-success(type='button')
-            i.fa.fa-plus(data-toggle='tooltip' data-placement='top')
-        .card-body
-          br
-          .row.mb-3
-            .col-md-9.offset-1
-              div
-                .input-group
-                  input.form-control(type='url' name='web[0].url' placeholder='Web' aria-describedby='slugHelpInline' value='https://gianlucadelgobbo.net')
-            .col-md-2
-              button.btn.btn-danger(type='button')
-                i.fa.fa-trash(data-toggle='tooltip' data-placement='top')
-          .row.mb-3
-            .col-md-9.offset-1
-              div
-                .input-group
-                  input.form-control(type='url' name='web[1].url' placeholder='Web' aria-describedby='slugHelpInline' value='https://flxer.net')
-            .col-md-2
-              button.btn.btn-danger(type='button')
-                i.fa.fa-trash(data-toggle='tooltip' data-placement='top')
-      br
-      .card
-        .card-header
-          h4
-            .labelField City, country
-          button.float-right.mb-2.btn-sm.btn.btn-success(type='button')
-            i.fa.fa-plus(data-toggle='tooltip' data-placement='top')
-        .card-body
-          br
-          .row.mb-3
-            .col-md-9.offset-1
-              .form-group
-                label
-                .autocomplete-root
-                  input.form-control.location-search-input(type='text' autocomplete='off' role='combobox' aria-autocomplete='list' aria-expanded='false' placeholder='City, country' value='Rome, Italy')
-                  .autocomplete-dropdown-container
-            .col-md-2
-              button.btn.btn-danger(type='button')
-                i.fa.fa-trash(data-toggle='tooltip' data-placement='top')
-      hr
-      button.btn.btn-primary.btn-lg.btn-block(type='submit') Save
+    button.btn.btn-primary.btn-lg.btn-block(type='submit')=__("Save")

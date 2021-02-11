@@ -98,9 +98,9 @@ upload.uploader = (req, res, done) => {
     if (err) {
       logger.debug("upload err");
       logger.debug(err);
-      done({ errors: { form_error: [err] } }, null);
+      done({ errors: { image: [err] } }, null);
     } else if (!options) {
-      done({ errors: { form_error: [{
+      done({ errors: { image: [{
         "fieldname":"image",
         "err": "UPLOAD_CONFIG_ERROR"
       }] } }, null);

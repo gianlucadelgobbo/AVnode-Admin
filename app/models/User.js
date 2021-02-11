@@ -78,7 +78,7 @@ const userSchema = new Schema({
   },
   likes: {},
 
-  slug: { type: String, unique: true, trim: true, required: true, minlength: 3, maxlength: 100,
+  slug: { type: String, unique: true, trim: true, required: [true, 'FIELD_REQUIRED'], minlength: [3, 'FIELD_TOO_SHORT'], maxlength: [50, 'FIELD_TOO_LONG'] ,
     validate: [(slug) => {
       var re = /^[a-z0-9-_]+$/;
       return re.test(slug)
@@ -203,6 +203,7 @@ const userSchema = new Schema({
     virtuals: true
   }
 });
+userSchema.plugin(uniqueValidator, { message: 'FIELD_ALREADY_EXISTS' });
 
 userSchema.virtual('birthdayFormatted').get(function () {
   if (this.birthday) {

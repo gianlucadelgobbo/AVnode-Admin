@@ -1,0 +1,57 @@
+extends ../layout
+
+block content
+  .container
+    .row
+      .offset-lg-2.col-lg-8.col-md-12
+        form
+          //(autocomplete='off')
+          div
+            .form-group.row
+              label.col-form-label.col-md-3.labelSignup=__("Subscribe as")
+              .col-md-9
+                .form-group
+                  .btn-group.btn-group-toggle(data-toggle="buttons")
+                    label.col-form-label.btn.btn-primary.active
+                      input(type="radio" name="is_crew" value='false' autocomplete="off" onclick="$('#crew').collapse('hide')" checked)
+                      !=__("Single")
+                    label.col-form-label.btn.btn-primary
+                      input(type="radio" name="is_crew" value='true' autocomplete="off" onclick="$('#crew').collapse('show')")
+                      !=__("Crew/Organization")
+              
+          .collapse#crew
+            .form-group.row
+              label.col-form-label.col-md-3=__("Crew Name")
+              .col-md-9.mb-4
+                input.form-control(type='text' name='crewName' placeholder=__("Crew Name") value='')
+            h4.mt-2=__("YOU AS MEMBER OF THE CREW")
+            .mb-4=__("You will be able to add crew members once you confirmed your account")
+          .form-group.row
+            label.col-form-label.col-md-3=__("Stage Name")
+            .col-md-9.mb-4
+              input.form-control(type='text' name='stagename' placeholder=__("Stage Name") value='')
+          .form-group.row
+            label.col-form-label.col-md-3=__("Birthday")
+            .col-md-9.mb-4
+              input.form-control(type='text' name='birthday' placeholder=__("DD/MM/YYYY") value='')
+          .form-group.row
+            label.col-form-label.col-md-3=__("Email")
+            .col-md-9.mb-4
+              input.form-control(type='email' name='email' placeholder=__("Email") value='')
+          .form-group.row
+            label.col-form-label.col-md-3=__("City, country")
+            .col-md-9.mb-4
+              input.form-control.location-search-input(type='text' name='addresses[0][formatted_address]' autocomplete='off' role='combobox' aria-autocomplete='list' aria-expanded='false' placeholder='City, country' value='')
+              input.lat(type='hidden' name='addresses[0][geometry][lat]' value='')
+              input.lng(type='hidden' name='addresses[0][geometry][lng]' value='')
+              input.locality(type='hidden' name='addresses[0][locality]' value='')
+              input.country(type='hidden' name='addresses[0][country]' value='')
+          .form-group.row
+            label.col-form-label.col-md-3=__("Password")
+            .col-md-9.mb-4
+              input.form-control(type='password' name='password' autocomplete='new-password' placeholder=__("Password") value='')
+          .form-group.row
+            label.col-form-label.col-md-3=__("Confirm Password")
+            .col-md-9.mb-4
+              input.form-control(type='password' name='confirmPassword' autocomplete='new-password' placeholder=__("Confirm Password") value='')
+          button.btn.btn-primary.float-right.btn-lg.mb-3(type='submit')=__("SIGNUP")

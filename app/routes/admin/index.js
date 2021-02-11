@@ -11,11 +11,30 @@ const logger = require('../../utilities/logger');
 
 router.use('/api', api);
 
+router.post('/:sez/:id/:form/', (req, res) => {
+  /* if (['profile/image','crews/image','events/image','news/image','performances/image','footage/media','galleries/medias','videos/video'].indexOf(req.params.sez+'/'+req.params.form)!== -1) {
+    req.params.comp = ['footage/media','videos/video'].indexOf(req.params.sez+'/'+req.params.form)!== -1 ? "media" : ['galleries/medias'].indexOf(req.params.sez+'/'+req.params.form)!== -1 ? "image" : req.params.form;
+    upload.uploader(req, res, (err, data) => {
+      if (!data) {
+        console.log("stocazzo2")
+        res.status(500).send(err);
+      } else {
+        console.log("stocazzo")
+        for (const item in data) req.body[item] = data[item];
+        put.putData(req, res, "admin/"+req.params.sez+"_"+req.params.form);
+      }
+    });
+  } else { */
+    put.putData(req, res, "admin/"+req.params.sez+"_"+req.params.form);
+  //}
+});
+
 // PROFILE GET
 router.get('/profile/:form/', (req, res) => {
+  console.log("stocazzo")
   req.params.id = req.user.id;
   req.params.sez = 'profile';
-  get.getData(req, res);
+  get.getData(req, res, "admin/profile_public");
 });
 
 router.get('/:sez/:id/delete', (req, res) => {
@@ -115,8 +134,12 @@ router.get('/loggeduser', (req, res) => {
 });
 
 router.get('/:sez', (req, res) => {
-  req.params.id = req.user.id;
-  get.getList(req, res);
+  if (req.params.sez == "profile") {
+    res.redirect("/admin/profile/"+req.user.id+"/public")
+  } else {
+    req.params.id = req.user.id;
+    get.getList(req, res, "admin/"+req.params.sez);
+  }
 });
 /* 
 router.get('/subscriptions', (req, res) => {
@@ -130,13 +153,6 @@ router.get('/profile/:id/subscriptions', (req, res) => {
   get.getSubscriptions(req, res);
 });
 
-router.get('/*', (req, res) => {
-  res.status(404).send({ message: `API_NOT_FOUND` });
-});
-
-router.get('', (req, res) => {
-  res.status(404).send({ message: `API_NOT_FOUND` });
-});
 
 
 
@@ -154,14 +170,16 @@ router.get('/profile/:id/subscriptions', (req, res) => {
   get.getSubscriptions(req, res);
 });
 
+
+
 router.get('/*', (req, res) => {
-  res.render('adminpro/home', {
-    title: __('Your Account'),
-    currentUrl: req.originalUrl
-  });
+  if (req.user.id) {
+    res.redirect("/admin/profile/"+req.user.id+"/public")
+  } else {
+    res.redirect("/404")
+    //res.status(404).send({ message: `API_NOT_FOUND` });
+  }
 });
-
-
 
 
 
@@ -281,20 +299,5 @@ router.post('/contact', (req, res)=>{
   }
 }); */
 
-router.put('/:sez/:id/:form/', (req, res) => {
-  if (['profile/image','crews/image','events/image','news/image','performances/image','footage/media','galleries/medias','videos/video'].indexOf(req.params.sez+'/'+req.params.form)!== -1) {
-    req.params.comp = ['footage/media','videos/video'].indexOf(req.params.sez+'/'+req.params.form)!== -1 ? "media" : ['galleries/medias'].indexOf(req.params.sez+'/'+req.params.form)!== -1 ? "image" : req.params.form;
-    upload.uploader(req, res, (err, data) => {
-      if (!data) {
-        res.status(500).send(err);
-      } else {
-        for (const item in data) req.body[item] = data[item];
-        put.putData(req, res);
-      }
-    });
-  } else {
-    put.putData(req, res);
-  }
-});
 
 module.exports = router;

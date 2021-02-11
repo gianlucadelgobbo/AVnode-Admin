@@ -70,7 +70,9 @@ const compress_js_admin = () => {
     './gulp/js/includes_admin/moment-with-locales.min.js',
     './gulp/js/includes_admin/jquery.serializejson.min.js',
     './gulp/js/includes_admin/bootstrap-table.min.js',
-    './gulp/js/includes_admin/cookielawinfo.min.js'
+    './gulp/js/includes_admin/cookielawinfo.min.js',
+    './gulp/js/includes_admin/jquery.geocomplete.js',
+    './gulp/js/includes_admin/dropzone.min.js'
   ])
   .pipe(concat('combo_admin.min.js'))
   .pipe(uglify({mangle: { reserved: ['glink'] } }))

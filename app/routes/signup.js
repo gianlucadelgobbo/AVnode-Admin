@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
   if (req.user) {
     return res.redirect('/admin/profile/'+req.user._id+'/public');
   }
-  res.render('admin/index', {
+  res.render('admin/signup', {
     title: __('Create Account')
   });
 });
